@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "pocket-kai-api"
+version = "0.1.0"
+description = ""
+authors = ["printeromg <PrinterOMG@ya.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.11.*"
+fastapi = "^0.109.2"
+uvicorn = "^0.27.0.post1"
+sqlalchemy = {version = "^2.0.25", extras = ["asyncio"]}
+alembic = "^1.13.1"
+sqlalchemy-utils = "^0.41.1"
+beautifulsoup4 = "^4.12.3"
+pydantic-settings = "^2.2.1"
+phonenumbers = "^8.13.33"
+aiohttp = "^3.9.3"
+asyncpg = "^0.29.0"
+cryptography = "^42.0.5"
+
+
+[tool.poetry.group.dev.dependencies]
+tqdm = "^4.66.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
