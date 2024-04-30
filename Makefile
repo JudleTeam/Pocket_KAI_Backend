@@ -9,3 +9,6 @@ make_migrations:
 
 migrate:
 	docker exec pocket_kai_fastapi alembic upgrade heads
+
+parse_schedule:
+	docker exec pocket_kai_fastapi poetry run python -m schedule_updater

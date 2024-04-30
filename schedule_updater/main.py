@@ -1,11 +1,5 @@
 import asyncio
-import datetime
 import logging
-from asyncio import create_task
-from pprint import pprint
-
-import tqdm.asyncio
-from sqlalchemy.exc import IntegrityError
 
 from database.base import async_session_maker
 from database.models.kai import Group, GroupLesson, Teacher, Department, Discipline
