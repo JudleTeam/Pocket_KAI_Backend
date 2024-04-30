@@ -1,5 +1,6 @@
 import os
 from datetime import date
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from dotenv import load_dotenv
@@ -13,38 +14,43 @@ import sqlalchemy as sa
 from config import get_settings
 from database.base import Base
 
+if TYPE_CHECKING:
+    from database.models import PocketKAIUser
+    from database.models.kai import Group
+
+
 settings = get_settings()
 
 
 class KAIUser(Base):
     __tablename__ = 'kai_user'
 
-    kai_id:     Mapped[int] = mapped_column(sa.BigInteger, unique=True, nullable=True)
+    kai_id:     Mapped[int | None] = mapped_column(sa.BigInteger, unique=True)
 
-    position:   Mapped[int] = mapped_column(nullable=True)
-    login:      Mapped[str] = mapped_column(unique=True, nullable=True)
-    password:   Mapped[str] = mapped_column(StringEncryptedType(key=settings.SECRET_KEY), nullable=True)
-    full_name:  Mapped[str] = mapped_column(nullable=False)
-    phone:      Mapped[str] = mapped_column(nullable=True, unique=False)  # Бывает что у двух людей один и тот же номер!
-    email:      Mapped[str] = mapped_column(nullable=False, unique=True)
-    sex:        Mapped[str] = mapped_column(nullable=True)
-    birthday:   Mapped[date] = mapped_column(nullable=True)
-    is_leader:  Mapped[bool] = mapped_column(nullable=False)
+    position:   Mapped[int | None] = mapped_column()
+    login:      Mapped[str | None] = mapped_column(unique=True)
+    password:   Mapped[str | None] = mapped_column(StringEncryptedType(key=settings.SECRET_KEY))
+    full_name:  Mapped[str] = mapped_column()
+    phone:      Mapped[str | None] = mapped_column(unique=False)  # Бывает что у двух людей один и тот же номер!
+    email:      Mapped[str] = mapped_column(unique=True)
+    sex:        Mapped[str | None] = mapped_column()
+    birthday:   Mapped[date | None] = mapped_column()
+    is_leader:  Mapped[bool] = mapped_column()
 
-    zach_number:        Mapped[str] = mapped_column(nullable=True)  # Уникальный?
-    competition_type:   Mapped[str] = mapped_column(nullable=True)
-    contract_number:    Mapped[int] = mapped_column(sa.BigInteger, nullable=True)  # Уникальный?
-    edu_level:          Mapped[str] = mapped_column(nullable=True)
-    edu_cycle:          Mapped[str] = mapped_column(nullable=True)
-    edu_qualification:  Mapped[str] = mapped_column(nullable=True)
-    program_form:       Mapped[str] = mapped_column(nullable=True)
-    status:             Mapped[str] = mapped_column(nullable=True)
+    zach_number:        Mapped[str | None] = mapped_column()  # Уникальный?
+    competition_type:   Mapped[str | None] = mapped_column()
+    contract_number:    Mapped[int | None] = mapped_column(sa.BigInteger)  # Уникальный?
+    edu_level:          Mapped[str | None] = mapped_column()
+    edu_cycle:          Mapped[str | None] = mapped_column()
+    edu_qualification:  Mapped[str | None] = mapped_column()
+    program_form:       Mapped[str | None] = mapped_column()
+    status:             Mapped[str | None] = mapped_column()
 
-    group_id:           Mapped[UUID] = mapped_column(ForeignKey('group.id', name='fk_kai_user_group'), nullable=False)
+    group_id:           Mapped[UUID] = mapped_column(ForeignKey('group.id', name='fk_kai_user_group'))
     pocket_kai_user_id: Mapped[UUID] = mapped_column(ForeignKey('pocket_kai_user.id'), unique=True)
 
-    group: Mapped['Group'] = relationship('Group', foreign_keys=[group_id], back_populates='members')
-    pocket_kai_user: Mapped['PocketKAIUser'] = relationship('PocketKAIUser', back_populates='kai_user')
+    group: Mapped['Group'] = relationship(foreign_keys=[group_id], back_populates='members')
+    pocket_kai_user: Mapped['PocketKAIUser'] = relationship(back_populates='kai_user')
 
     async def get_classmates(self, db: async_sessionmaker):
         async with db() as session:

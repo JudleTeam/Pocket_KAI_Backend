@@ -2,7 +2,7 @@ from .group import Group
 from .group_lesson import GroupLesson
 from .institute import Institute
 from .profile import Profile
-from .department import Departament
+from .department import Department
 from .speciality import Speciality
 from .user import KAIUser
 from .teacher import Teacher

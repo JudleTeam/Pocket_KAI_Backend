@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from typing import Self
 from uuid import UUID
 
@@ -17,6 +18,7 @@ async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
 class Base(AsyncAttrs, DeclarativeBase):
     id: Mapped[UUID] = mapped_column(primary_key=True, server_default=text('gen_random_uuid()'))
+    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
     @classmethod
     async def get_or_create(

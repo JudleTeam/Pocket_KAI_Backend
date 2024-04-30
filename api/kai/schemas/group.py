@@ -1,13 +1,40 @@
-from pydantic import BaseModel
+from datetime import datetime
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict
 
 
-class GroupBase(BaseModel):
-    pass
+class TunedModel(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True
+    )
 
 
-class GroupCreate(GroupBase):
-    pass
+class ShortGroupRead(TunedModel):
+    id: UUID
+    group_name: str
+    is_verified: bool
+    parsed_at: datetime | None
 
 
-class GroupRead(GroupBase):
-    group_id: int
+class FullGroupRead(TunedModel):
+    id: UUID
+    kai_id: int
+
+    group_leader_id: UUID | None
+    pinned_text: str | None
+    group_name: str
+
+    is_verified: bool
+    verified_at: datetime | None
+    created_at: datetime
+    parsed_at: datetime | None
+
+    syllabus_url: str | None
+    educational_program_url: str | None
+    study_schedule_url: str | None
+
+    # speciality: SpecialityRead
+    # profile: ProfileRead
+    # department: DepartmentRead
+    # institute: InstituteRead

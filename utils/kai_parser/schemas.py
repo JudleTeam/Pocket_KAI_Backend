@@ -1,7 +1,9 @@
 import datetime
-from enum import Enum
+from functools import cached_property
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator
+
+from core.entities.lesson import LessonParity, LessonType
 
 
 class KaiApiError(Exception):
@@ -16,9 +18,9 @@ class BadCredentials(Exception):
     """Bad credentials for login"""
 
 
-class GroupsResult(BaseModel):
+class ParsedGroup(BaseModel):
     forma: str
-    group: str
+    name: str
     id: int
 
 
@@ -28,47 +30,122 @@ class Teacher(BaseModel):
     teacher_full_name: str
 
 
-class LessonType(str, Enum):
-    lecture = 'лек'
-    practice = 'пр'
-    laboratory_work = 'л.р.'
-    consultation = 'конс'
+class ParsedLesson(BaseModel):
+    model_config = ConfigDict(
+        str_strip_whitespace=True
+    )
 
+    day_number: int
+    start_time: datetime.time | None
+    dates: str
 
-class Lesson(BaseModel):
-    dayNum: int
-    dayTime: datetime.time | None
-    dayDate: str
-    disciplName: str
-    audNum: str
-    buildNum: str
-    disciplType: str
-    disciplNum: int
-    orgUnitId: int
-    prepodName: str
-    prepodLogin: str
-    orgUnitName: str
+    discipline_name: str
+    discipline_type: str
+    discipline_number: int
 
-    @field_validator('audNum')
+    audience_number: str
+    building_number: str
+
+    department_id: int
+    department_name: str
+
+    teacher_name: str
+    teacher_login: str
+
+    @field_validator('audience_number')
     @classmethod
-    def remove_dashes(cls, add_num: str):
-        return add_num.replace('-', '')
+    def remove_dashes(cls, value: str) -> str:
+        return value.replace('-', '')
 
-    @field_validator('prepodName')
+    @field_validator('teacher_name')
     @classmethod
-    def title_teacher_name(cls, prepod_name: str):
-        return prepod_name.title()
+    def title_str(cls, value: str) -> str:
+        return value.title()
 
-    @field_validator('dayTime', mode='before')
+    @field_validator('start_time', mode='before')
     @classmethod
-    def convert_time(cls, day_time: str):
+    def parse_time_from_str(cls, str_time: str) -> datetime.time | None:
         try:
-            return datetime.datetime.strptime(day_time.strip(), '%H:%M').time()
+            return datetime.datetime.strptime(str_time.strip(), '%H:%M').time()
         except ValueError:
-            return
+            return None
 
-    class Config:
-        str_strip_whitespace = True
+    @cached_property
+    def parsed_parity(self) -> LessonParity:
+        dates = self.dates.replace('ё', 'e')
+
+        # 'нея' - typo.
+        if 'нечет' in dates or 'неч' in dates or 'нея' in dates:
+            odd = True
+            dates = dates.replace('нечет', '')
+        else:
+            odd = False
+
+        even = 'чет' in dates
+
+        if odd and not even:
+            return LessonParity.odd
+        if even and not odd:
+            return LessonParity.even
+        return LessonParity.any
+
+    @cached_property
+    def parsed_lesson_type(self) -> LessonType:
+        if 'физическая культура' in self.discipline_name.lower():
+            return LessonType.physical_education
+
+        match self.discipline_type:
+            case 'лек':
+                return LessonType.lecture
+            case 'пр':
+                return LessonType.practice
+            case 'л.р.':
+                return LessonType.laboratory_work
+            case 'конс':
+                return LessonType.consultation
+            case 'к.р.':
+                return LessonType.course_work
+            case 'и.д.':
+                return LessonType.individual_task
+            case _:
+                return LessonType.unknown
+
+    @cached_property
+    def end_time(self) -> datetime.time | None:
+        if self.start_time is None:
+            return None
+
+        start_times = (
+            datetime.timedelta(hours=8, minutes=00),
+            datetime.timedelta(hours=9, minutes=40),
+            datetime.timedelta(hours=11, minutes=20),
+            datetime.timedelta(hours=13, minutes=30),
+            datetime.timedelta(hours=15, minutes=10),
+            datetime.timedelta(hours=16, minutes=50),
+            datetime.timedelta(hours=18, minutes=25),
+            datetime.timedelta(hours=20, minutes=00)
+        )
+
+        start_time = datetime.timedelta(hours=self.start_time.hour, minutes=self.start_time.minute)
+
+        if start_time not in start_times:
+            return None
+
+        lesson_timedelta = datetime.timedelta(hours=1, minutes=30)
+
+        # Если лаб. работы по 2 пары сразу:
+        # if lesson_type == 'л.р.':
+        #     next_lesson_ind = start_times.index(start_time) + 1
+        #     if next_lesson_ind > len(start_times) - 1:
+        #         # Бывают лабораторные работы в 20:00, видимо они длятся одну пару
+        #         next_lesson_ind = len(start_times) - 1
+        #     end_time = start_times[next_lesson_ind] + lesson_timedelta
+        # else:
+        #     end_time = start_time + lesson_timedelta
+
+        end_time = start_time + lesson_timedelta
+
+        return (datetime.datetime.min + end_time).time()
 
 
 class BaseUser(BaseModel):
@@ -83,6 +160,7 @@ class UserInfo(BaseUser):
 
 
 class UserAbout(BaseModel):
+    # TODO: update attribute names
     groupNum: int
     competitionType: str
     specCode: str

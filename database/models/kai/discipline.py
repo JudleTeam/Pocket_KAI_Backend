@@ -7,5 +7,5 @@ from database.base import Base
 class Discipline(Base):
     __tablename__ = 'discipline'
 
-    kai_id: Mapped[int] = mapped_column(sa.BigInteger, unique=True, nullable=False)
-    name: Mapped[str] = mapped_column(nullable=False)
+    kai_id: Mapped[int] = mapped_column(sa.BigInteger, unique=True)
+    name: Mapped[str] = mapped_column()

@@ -9,8 +9,9 @@ from aiohttp.abc import AbstractCookieJar
 from bs4 import BeautifulSoup
 
 from utils.kai_parser import helper
-from utils.kai_parser.schemas import (KaiApiError, UserAbout, FullUserData, Group, UserInfo, BadCredentials,
-                                               ParsingError, Documents, Teacher, GroupsResult, Lesson)
+from utils.kai_parser.schemas import (
+    KaiApiError, UserAbout, FullUserData, Group, UserInfo, BadCredentials, Documents, ParsedGroup, ParsedLesson
+)
 
 
 class KaiParser:
@@ -21,7 +22,8 @@ class KaiParser:
     syllabus_url = 'https://kai.ru/group/guest/student/ucebnyj-plan'
 
     base_headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+                      '(KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
         'Content-Type': 'application/x-www-form-urlencoded'
     }
 
@@ -83,6 +85,7 @@ class KaiParser:
     @classmethod
     async def get_documents(cls, login, password, login_cookies=None) -> Documents:
         """Need fix"""
+        # TODO: Still need a fix?
         soup = await cls._request('GET', cls.syllabus_url, True, login_cookies=login_cookies,
                                   login=login, password=password, return_soup=True)
 
@@ -194,7 +197,7 @@ class KaiParser:
         return helper.parse_group_members(soup)
 
     @classmethod
-    async def get_group_ids(cls) -> list[GroupsResult]:
+    async def get_group_ids(cls) -> list[ParsedGroup]:
         params = {
             'p_p_id': 'pubStudentSchedule_WAR_publicStudentSchedule10',
             'p_p_lifecycle': 2,
@@ -202,7 +205,13 @@ class KaiParser:
         }
 
         result = await cls._request('POST', cls.base_url, params=params, return_json=True)
-        return [GroupsResult(**group) for group in result]
+        return [
+            ParsedGroup(
+                forma=group.get('forma'),
+                name=group.get('group'),
+                id=group.get('id'),
+            ) for group in result
+        ]
 
     @classmethod
     async def _get_login_cookies(cls, login, password, retries=1) -> AbstractCookieJar | None:
@@ -253,16 +262,30 @@ class KaiParser:
         return await cls._get_login_cookies(login, password, retries + 1)
 
     @classmethod
-    async def get_group_schedule(cls, group_id: int) -> list[Lesson]:
+    async def get_group_schedule(cls, group_kai_id: int) -> list[ParsedLesson]:
         params = {
             'p_p_id': 'pubStudentSchedule_WAR_publicStudentSchedule10',
             'p_p_lifecycle': 2,
             'p_p_resource_id': 'schedule'
         }
         data = {
-            'groupId': group_id
+            'groupId': group_kai_id
         }
 
         result = await cls._request('POST', cls.base_url, data=data, params=params, return_json=True)
-        return [Lesson(**lesson) for day_lessons in result.values() for lesson in day_lessons]
-
+        return [
+            ParsedLesson(
+                day_number=lesson.get('dayNum'),
+                start_time=lesson.get('dayTime'),
+                dates=lesson.get('dayDate'),
+                discipline_name=lesson.get('disciplName'),
+                audience_number=lesson.get('audNum'),
+                building_number=lesson.get('buildNum'),
+                discipline_type=lesson.get('disciplType'),
+                discipline_number=lesson.get('disciplNum'),
+                department_id=lesson.get('orgUnitId'),
+                teacher_name=lesson.get('prepodName'),
+                teacher_login=lesson.get('prepodLogin'),
+                department_name=lesson.get('orgUnitName'),
+            ) for day_lessons in result.values() for lesson in day_lessons
+        ]

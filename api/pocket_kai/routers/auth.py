@@ -2,7 +2,7 @@ import secrets
 
 from fastapi import APIRouter, HTTPException, status
 
-from api.dependencies import token_service_dep, kai_user_service_dep
+from api.dependencies import TokenServiceDep, KaiUserServiceDep
 from api.pocket_kai.schemas.auth import LoginForm, TokenRead
 from database.models.token import Token
 
@@ -12,8 +12,8 @@ router = APIRouter()
 @router.post('/login', response_model=TokenRead)
 async def login(
     login_data: LoginForm,
-    token_service: token_service_dep,
-    kai_user_service: kai_user_service_dep
+    token_service: TokenServiceDep,
+    kai_user_service: KaiUserServiceDep
 ) -> Token:
     exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                               detail='Invalid credentials. Check login and password or try to register')

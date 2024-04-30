@@ -4,11 +4,11 @@ from sqlalchemy.orm import Mapped, mapped_column
 from database.base import Base
 
 
-class Departament(Base):
-    __tablename__ = 'departament'
+class Department(Base):
+    __tablename__ = 'department'
 
-    kai_id: Mapped[int] = mapped_column(sa.BigInteger, unique=True, nullable=False)
-    name: Mapped[str] = mapped_column(nullable=False)
+    kai_id: Mapped[int] = mapped_column(sa.BigInteger, unique=True)
+    name: Mapped[str] = mapped_column()
 
     @property
     def short_name(self):

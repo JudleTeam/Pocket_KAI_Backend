@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import Column, String, Integer, ForeignKey, text, select, func, or_
@@ -6,16 +7,19 @@ import sqlalchemy as sa
 
 from database.base import Base
 
+if TYPE_CHECKING:
+    from database.models.kai import Department
+
 
 class Teacher(Base):
     __tablename__ = 'teacher'
 
     login: Mapped[str] = mapped_column(unique=True)
-    name: Mapped[str] = mapped_column(nullable=False)
+    name: Mapped[str] = mapped_column()
 
-    departament_id: Mapped[UUID] = mapped_column(ForeignKey('departament.id'))
+    departament_id: Mapped[UUID] = mapped_column(ForeignKey('department.id'))
 
-    departament: Mapped['Departament'] = relationship('Departament', lazy='selectin', backref='teachers')
+    department: Mapped['Department'] = relationship(lazy='selectin')
 
     @classmethod
     async def search_by_name(cls, session, name, similarity=0.3, limit=50, offset=0):
