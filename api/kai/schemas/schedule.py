@@ -27,5 +27,5 @@ class Week(BaseModel):
 
 
 class WeekDaysResponse(BaseModel):
-    parity: WeekParity
+    week_parity: WeekParity
     week_days: Week
