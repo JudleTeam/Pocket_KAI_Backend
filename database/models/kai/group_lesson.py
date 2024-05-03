@@ -1,5 +1,4 @@
-from datetime import UTC, date, datetime, time
-from functools import partial
+from datetime import date, datetime, time
 from typing import Optional, TYPE_CHECKING
 from uuid import UUID
 

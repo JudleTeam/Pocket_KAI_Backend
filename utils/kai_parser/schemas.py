@@ -3,7 +3,7 @@ from functools import cached_property
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
-from core.entities.lesson import LessonParity, LessonType
+from core.entities.lesson import WeekParity, LessonType
 
 
 class KaiApiError(Exception):
@@ -71,7 +71,7 @@ class ParsedLesson(BaseModel):
             return None
 
     @cached_property
-    def parsed_parity(self) -> LessonParity:
+    def parsed_parity(self) -> WeekParity:
         dates = self.dates.replace('ё', 'e')
 
         # 'нея' - typo.
@@ -84,10 +84,10 @@ class ParsedLesson(BaseModel):
         even = 'чет' in dates
 
         if odd and not even:
-            return LessonParity.odd
+            return WeekParity.odd
         if even and not odd:
-            return LessonParity.even
-        return LessonParity.any
+            return WeekParity.even
+        return WeekParity.any
 
     @cached_property
     def parsed_lesson_type(self) -> LessonType:

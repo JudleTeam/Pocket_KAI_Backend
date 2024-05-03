@@ -1,109 +1,144 @@
 import datetime as dt
-from typing import Literal
+from abc import ABC, abstractmethod
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
-from sqlalchemy import select
-
-from core.entities.lesson import LessonParity, LessonType
-from core.services.base import BaseService
-from database.models.kai import GroupLesson
-
-
-class DisciplineRead(BaseModel):
-    model_config = ConfigDict(
-        from_attributes=True
-    )
-
-    kai_id: int
-    name: str
+from core.entities.group import GroupEntity
+from core.entities.lesson import LessonEntity, WeekParity
+from core.entities.schedule import DayEntity, WeekEntity
+from core.services.group import GroupServiceBase
+from core.services.lesson import LessonServiceBase
 
 
-class DepartmentRead(BaseModel):
-    model_config = ConfigDict(
-        from_attributes=True
-    )
+class ScheduleServiceBase(ABC):
+    def __init__(
+        self,
+        lesson_service: LessonServiceBase,
+        group_service: GroupServiceBase
+    ):
+        self._lesson_service = lesson_service
+        self._group_service = group_service
 
-    kai_id: int
-    name: str
+    @abstractmethod
+    async def get_schedule_with_dates_by_group_id(
+        self,
+        group_id: UUID,
+        date_from: dt.date,
+        days_count: int
+    ) -> list[DayEntity]:
+        raise NotImplementedError
 
+    @abstractmethod
+    async def get_schedule_with_dates_by_group_name(
+        self,
+        group_name: str,
+        date_from: dt.date,
+        days_count: int
+    ) -> list[DayEntity]:
+        raise NotImplementedError
 
-class TeacherRead(BaseModel):
-    model_config = ConfigDict(
-        from_attributes=True
-    )
+    @abstractmethod
+    async def get_schedule_with_week_days_by_group_id(
+        self,
+        group_id: UUID,
+        week_parity: WeekParity
+    ) -> WeekEntity:
+        raise NotImplementedError
 
-    login: str
-    name: str
-
-    department: DepartmentRead
-
-
-class LessonRead(BaseModel):
-    model_config = ConfigDict(
-        from_attributes=True
-    )
-
-    group_id: UUID
-    number_of_day: int
-    original_dates: str | None
-    parsed_parity: LessonParity
-    parsed_dates: list[dt.date] | None
-    audience_number: str | None
-    building_number: str | None
-    original_lesson_type: str | None
-    parsed_lesson_type: LessonType
-    start_time: dt.time
-    end_time: dt.time | None
-
-    teacher: TeacherRead | None
-    discipline: DisciplineRead
-
-
-class DayResponse(BaseModel):
-    date: dt.date
-    parity: LessonParity = LessonParity.any
-    lessons: list[LessonRead]
+    @abstractmethod
+    async def get_schedule_with_week_days_by_group_name(
+        self,
+        group_name: str,
+        week_parity: WeekParity
+    ) -> WeekEntity:
+        raise NotImplementedError
 
 
-class ScheduleService(BaseService):
-    async def _get_lessons_for_group(self, group_id: UUID | str):
-        stmt = (
-            select(GroupLesson)
-            .where(
-                GroupLesson.group_id == group_id
-            )
-        )
-
-        records = await self.session.scalars(stmt)
-        return records.all()
-
-    def _filter_lessons_by_date(self, lessons: list[GroupLesson], date: dt.date) -> list[GroupLesson]:
+class ScheduleService(ScheduleServiceBase):
+    @staticmethod
+    def _filter_lessons_by_date(group_lessons: list[LessonEntity], date: dt.date) -> list[LessonEntity]:
         day_number = date.isoweekday()
-        date_week_parity = LessonParity.get_parity_for_date(date)
+        date_week_parity = WeekParity.get_parity_for_date(date)
         filtered_lessons = []
 
-        for lesson in lessons:
-            if lesson.number_of_day == day_number and lesson.parsed_parity in (LessonParity.any, date_week_parity):
+        for lesson in group_lessons:
+            if lesson.number_of_day == day_number and lesson.parsed_parity in (WeekParity.any, date_week_parity):
                 filtered_lessons.append(lesson)
 
         return filtered_lessons
 
-    async def get_group_schedule_with_dates(self, group_id: UUID | str, date_from: dt.date, days: int):
-        dates = [date_from + dt.timedelta(days=x) for x in range(days + 1)]
-        group_lessons = await self._get_lessons_for_group(group_id)
+    async def _get_schedule_with_week_days_by_group(self, group: GroupEntity, week_parity: WeekParity) -> WeekEntity:
+        group_lessons = await self._lesson_service.get_by_group_id(group.id, week_parity=week_parity)
 
-        schedule = []
+        lessons_by_week_days = {
+            'monday'   : [],
+            'tuesday'  : [],
+            'wednesday': [],
+            'thursday' : [],
+            'friday'   : [],
+            'saturday' : [],
+            'sunday'   : []
+        }
+
+        day_mapping = {
+            1: 'monday',
+            2: 'tuesday',
+            3: 'wednesday',
+            4: 'thursday',
+            5: 'friday',
+            6: 'saturday',
+            7: 'sunday'
+        }
+
+        for lesson in group_lessons:
+            day = day_mapping.get(lesson.number_of_day)
+            if day:
+                lessons_by_week_days[day].append(lesson)
+
+        return WeekEntity(week_parity=week_parity, week_days=lessons_by_week_days)
+
+    async def get_schedule_with_week_days_by_group_id(self, group_id: UUID, week_parity: WeekParity) -> WeekEntity:
+        group = await self._group_service.get_by_id(group_id)
+        return await self._get_schedule_with_week_days_by_group(group, week_parity=week_parity)
+
+    async def get_schedule_with_week_days_by_group_name(self, group_name: str, week_parity: WeekParity) -> WeekEntity:
+        group = await self._group_service.get_by_name(group_name)
+        return await self._get_schedule_with_week_days_by_group(group, week_parity=week_parity)
+
+    async def _get_schedule_with_dates_by_group(
+        self,
+        group: GroupEntity,
+        date_from: dt.date,
+        days: int
+    ) -> list[DayEntity]:
+        dates = [date_from + dt.timedelta(days=x) for x in range(days + 1)]
+        group_lessons = await self._lesson_service.get_by_group_id(group.id)
+
+        schedule = list()
         for date in dates:
-            parity = LessonParity.get_parity_for_date(date)
-            schedule_day = DayResponse(
+            parity = WeekParity.get_parity_for_date(date)
+            schedule_day = DayEntity(
                 date=date,
                 parity=parity,
-                lessons=[
-                    LessonRead.model_validate(lesson)
-                    for lesson in self._filter_lessons_by_date(group_lessons, date)
-                ],
+                lessons=self._filter_lessons_by_date(group_lessons, date),
             )
             schedule.append(schedule_day)
 
         return schedule
+
+    async def get_schedule_with_dates_by_group_id(
+        self,
+        group_id: UUID,
+        date_from: dt.date,
+        days_count: int
+    ) -> list[DayEntity]:
+        group = await self._group_service.get_by_id(group_id)
+        return await self._get_schedule_with_dates_by_group(group, date_from, days_count)
+
+    async def get_schedule_with_dates_by_group_name(
+        self,
+        group_name: str,
+        date_from: dt.date,
+        days_count: int
+    ) -> list[DayEntity]:
+        group = await self._group_service.get_by_name(group_name)
+        return await self._get_schedule_with_dates_by_group(group, date_from, days_count)

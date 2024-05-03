@@ -1,10 +1,8 @@
-import os
 from datetime import date
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from dotenv import load_dotenv
-from sqlalchemy import Integer, Column, BigInteger, ForeignKey, String, Date, Boolean
+from sqlalchemy import ForeignKey
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.future import select
 from sqlalchemy.orm import relationship, Mapped, mapped_column

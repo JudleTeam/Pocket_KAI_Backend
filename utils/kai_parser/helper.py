@@ -1,9 +1,8 @@
 from datetime import datetime
-from pprint import pprint
 
 from bs4 import BeautifulSoup
 
-from utils.kai_parser.schemas import UserInfo, BaseUser, Group, ParsedLesson, LessonType, Teacher, Documents
+from utils.kai_parser.schemas import UserInfo, BaseUser, Group, Documents
 from utils.other import parse_phone_number
 
 

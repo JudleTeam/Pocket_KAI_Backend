@@ -1,38 +1,43 @@
-from typing import Sequence
+from abc import ABC, abstractmethod
 from uuid import UUID
 
-from core.services.base import BaseService
-from database.models.kai import Group
-
-from sqlalchemy import select
+from core.entities.group import GroupEntity
+from core.repositories.group import GroupRepositoryBase
 
 
-class GroupNotFoundError(Exception):
-    pass
+class GroupServiceBase(ABC):
+    def __init__(
+        self,
+        group_repository: GroupRepositoryBase,
+    ):
+        self.group_repository = group_repository
+
+    @abstractmethod
+    async def suggest_by_name(self, group_name: str, limit: int) -> list[GroupEntity]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_all(self, limit: int, offset: int) -> list[GroupEntity]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_by_id(self, group_id: UUID) -> GroupEntity:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_by_name(self, group_name: str) -> GroupEntity:
+        raise NotImplementedError
 
 
-class GroupService(BaseService):
-    async def suggest_by_name(self, group_name: str, limit: int) -> Sequence[Group]:
-        stmt = select(Group).where(Group.group_name.startswith(group_name)).limit(limit)
-        records = await self.session.scalars(stmt)
-        return records.all()
+class GroupService(GroupServiceBase):
+    async def suggest_by_name(self, group_name: str, limit: int) -> list[GroupEntity]:
+        return await self.group_repository.suggest_by_name(group_name, limit=limit)
 
-    async def get_all(self, limit: int, offset: int) -> Sequence[Group]:
-        stmt = select(Group).offset(offset).limit(limit)
-        records = await self.session.scalars(stmt)
-        return records.all()
+    async def get_all(self, limit: int, offset: int) -> list[GroupEntity]:
+        return await self.group_repository.list(limit=limit, offset=offset)
 
-    async def get_by_id(self, group_id: UUID) -> Group:
-        group = await self.session.get(Group, group_id)
-        if group is None:
-            raise GroupNotFoundError
+    async def get_by_id(self, group_id: UUID) -> GroupEntity:
+        return await self.group_repository.get_by_id(group_id)
 
-        return group
-
-    async def get_by_name(self, group_name: str) -> Group:
-        stmt = select(Group).where(Group.group_name == group_name)
-        group = await self.session.scalar(stmt)
-        if group is None:
-            raise GroupNotFoundError
-
-        return group
+    async def get_by_name(self, group_name: str) -> GroupEntity:
+        return await self.group_repository.get_by_name(group_name)

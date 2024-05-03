@@ -1,13 +1,9 @@
 import asyncio
-import datetime
-import logging
 from pprint import pprint
 
-from sqlalchemy.exc import IntegrityError
 
 from utils.kai_parser.parser import KaiParser
-from database.models.kai import GroupLesson, Group, Department, Teacher, Discipline
-from utils.kai_parser.schemas import KaiApiError, ParsedGroup
+from database.models.kai import GroupLesson
 
 
 def lesson_type_to_emoji(lesson_type: str):

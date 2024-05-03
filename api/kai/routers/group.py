@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, Query
 
 from api.dependencies import GroupServiceDep
 from api.kai.schemas.group import ShortGroupRead, FullGroupRead
-from core.services.group import GroupNotFoundError
+from core.exceptions.base import EntityNotFoundError
 
 
 router = APIRouter()
@@ -34,7 +34,7 @@ async def get_group_by_name(
 ):
     try:
         return await group_service.get_by_name(group_name)
-    except GroupNotFoundError:
+    except EntityNotFoundError:
         raise HTTPException(
             status_code=404, detail=f'Group with name "{group_name}" not found'
         )
@@ -50,17 +50,17 @@ async def get_group_by_id(
 ):
     try:
         return await group_service.get_by_id(group_id)
-    except GroupNotFoundError:
+    except EntityNotFoundError:
         raise HTTPException(
             status_code=404, detail=f'Group with ID "{group_id}" not found'
         )
 
 
-@router.get('/suggest/{group_name}', response_model=list[ShortGroupRead])
+@router.get('/suggest', response_model=list[ShortGroupRead])
 async def suggest_group_by_name(
-    group_name: str,
+    name: str,
     limit: Annotated[int, Query(ge=1, le=50)] = 20,
     *,
     group_service: GroupServiceDep
 ):
-    return await group_service.suggest_by_name(group_name, limit=limit)
+    return await group_service.suggest_by_name(name, limit=limit)

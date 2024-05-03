@@ -1,4 +1,3 @@
-from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import mapped_column, Mapped
 import sqlalchemy as sa
 

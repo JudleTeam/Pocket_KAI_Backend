@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime
 from typing import Self
 from uuid import UUID
@@ -13,7 +12,7 @@ from config import get_settings
 
 settings = get_settings()
 engine = create_async_engine(settings.database_url)
-async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
+AsyncSessionmaker = async_sessionmaker(engine, expire_on_commit=False)
 
 
 class Base(AsyncAttrs, DeclarativeBase):
@@ -41,5 +40,5 @@ class Base(AsyncAttrs, DeclarativeBase):
 
 
 async def get_async_session():
-    async with async_session_maker() as session:
+    async with AsyncSessionmaker() as session:
         yield session

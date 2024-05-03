@@ -8,5 +8,5 @@ from .schedule import router as schedule_router
 router = APIRouter()
 
 # router.include_router(login_router)
-router.include_router(group_router, prefix='/groups', tags=['Groups'])
+router.include_router(group_router, prefix='/group', tags=['Groups'])
 router.include_router(schedule_router, prefix='', tags=['Schedule'])

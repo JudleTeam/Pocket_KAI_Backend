@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from database.base import async_session_maker
+from database.base import AsyncSessionmaker
 from database.models.kai import Group, GroupLesson, Teacher, Department, Discipline
 from utils.kai_parser import KaiParser
 from utils.kai_parser.schemas import ParsedGroup, ParsedLesson
@@ -9,7 +9,7 @@ from utils.kai_parser.schemas import ParsedGroup, ParsedLesson
 
 async def add_groups(groups: list[ParsedGroup]) -> list[Group]:
     db_groups = []
-    async with async_session_maker() as session:
+    async with AsyncSessionmaker() as session:
         for group in groups:
             new_group, _ = await Group.get_or_create(
                 session=session,
@@ -23,7 +23,7 @@ async def add_groups(groups: list[ParsedGroup]) -> list[Group]:
 
 
 async def add_group_schedule(group_id, schedule: list[ParsedLesson]):
-    async with async_session_maker() as session:
+    async with AsyncSessionmaker() as session:
         for lesson in schedule:
             new_department, _ = await Department.get_or_create(
                 session=session,

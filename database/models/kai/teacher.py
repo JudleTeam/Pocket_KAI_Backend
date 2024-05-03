@@ -1,9 +1,8 @@
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import Column, String, Integer, ForeignKey, text, select, func, or_
+from sqlalchemy import ForeignKey, text, select, func, or_
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-import sqlalchemy as sa
 
 from database.base import Base
 
