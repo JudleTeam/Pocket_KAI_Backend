@@ -15,7 +15,7 @@ from utils.kai_parser.schemas import (
 
 
 class KaiParser:
-    base_url = 'https://kai.ru/raspisanie'
+    schedule_url = 'https://kai.ru/raspisanie'
     about_me_url = 'https://kai.ru/group/guest/common/about-me'
     my_group_url = 'https://kai.ru/group/guest/student/moa-gruppa'
     kai_main_url = 'https://kai.ru/main'
@@ -175,6 +175,7 @@ class KaiParser:
 
         login_cookies = await cls._get_login_cookies(login, password)
 
+        # TODO: сделать чтобы запускались одновременно?
         user_info = await cls.get_user_info(login, password, login_cookies)
         user_about = await cls.get_user_about(login, password, login_cookies=login_cookies)
         user_group = await cls.get_user_group_members(login, password, login_cookies)
@@ -204,7 +205,7 @@ class KaiParser:
             'p_p_resource_id': 'getGroupsURL'
         }
 
-        result = await cls._request('POST', cls.base_url, params=params, return_json=True)
+        result = await cls._request('POST', cls.schedule_url, params=params, return_json=True)
         return [
             ParsedGroup(
                 forma=group.get('forma'),
@@ -272,7 +273,7 @@ class KaiParser:
             'groupId': group_kai_id
         }
 
-        result = await cls._request('POST', cls.base_url, data=data, params=params, return_json=True)
+        result = await cls._request('POST', cls.schedule_url, data=data, params=params, return_json=True)
         return [
             ParsedLesson(
                 day_number=lesson.get('dayNum'),

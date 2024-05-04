@@ -2,8 +2,9 @@ from datetime import datetime
 
 from bs4 import BeautifulSoup
 
-from utils.kai_parser.schemas import UserInfo, BaseUser, Group, Documents
-from utils.other import parse_phone_number
+from utils.kai_parser.schemas.group import Documents, Group
+from utils.kai_parser.schemas.user import BaseUser, UserInfo
+from utils.kai_parser.utils import parse_phone_number
 
 
 def parse_user_info(soup: BeautifulSoup):
