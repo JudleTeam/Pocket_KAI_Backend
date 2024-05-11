@@ -42,16 +42,6 @@ class GenericRepository[T: BaseEntity](ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def add(self, entity: T) -> T:
-        """
-        Creates a new record
-
-        :param entity: The record to be created
-        :return: The created record
-        """
-        raise NotImplementedError()
-
-    @abstractmethod
     async def update(self, entity: T, **kwargs) -> T:
         """
         Updates an existing record.
@@ -91,7 +81,7 @@ class GenericSARepository[T: BaseEntity](GenericRepository[T], ABC):
         return self.model_cls(**entity.model_dump())
 
     async def _convert_entity_to_update_dict(self, entity: T, **kwargs) -> dict:
-        return entity.model_dump(exclude={'id'})
+        return entity.model_dump(exclude={'id'}, exclude_unset=True)
 
     def _construct_get_stmt(self, id: UUID) -> Select:
         """
@@ -129,6 +119,18 @@ class GenericSARepository[T: BaseEntity](GenericRepository[T], ABC):
 
         return stmt
 
+    async def _add(self, record: Base):
+        self._session.add(record)
+        try:
+            await self._session.flush()
+        except IntegrityError as error:
+            if 'ForeignKeyViolationError' in str(error):
+                raise BadRelatedEntityError from error
+            if 'UniqueViolationError' in str(error):
+                raise EntityAlreadyExistsError(entity=self.entity) from error
+
+            raise error
+
     async def get_by_id(self, id: UUID, **kwargs) -> T | None:
         stmt = self._construct_get_stmt(id)
         result = await self._session.scalar(stmt)
@@ -151,25 +153,6 @@ class GenericSARepository[T: BaseEntity](GenericRepository[T], ABC):
             await self._convert_db_to_entity(record, **kwargs)
             for record in records.all()
         ]
-
-    async def add(self, entity: T, **kwargs) -> T:
-        record = await self._convert_entity_to_db(entity)
-
-        self._session.add(record)
-
-        try:
-            await self._session.flush()
-        except IntegrityError as error:
-            if 'ForeignKeyViolationError' in str(error):
-                raise BadRelatedEntityError from error
-            if 'UniqueViolationError' in str(error):
-                raise EntityAlreadyExistsError(entity=self.entity) from error
-
-            raise error
-
-        await self._session.refresh(record)
-
-        return await self._convert_db_to_entity(record, **kwargs)
 
     async def update(self, entity: T, **kwargs) -> T:
         stmt = (

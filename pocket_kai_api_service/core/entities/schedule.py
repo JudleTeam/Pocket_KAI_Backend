@@ -5,6 +5,15 @@ from pydantic import BaseModel, ConfigDict
 from core.entities.lesson import LessonEntity, WeekParity
 
 
+class ScheduleEntity(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True
+    )
+
+    parsed_at: dt.datetime | None
+    days: list['DayEntity']
+
+
 class DayEntity(BaseModel):
     model_config = ConfigDict(
         from_attributes=True
@@ -34,5 +43,6 @@ class WeekEntity(BaseModel):
         from_attributes=True
     )
 
+    parsed_at: dt.datetime | None
     week_parity: WeekParity
     week_days: Week

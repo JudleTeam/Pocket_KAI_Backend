@@ -9,7 +9,7 @@ RUN pip install --no-cache-dir poetry
 ENV POETRY_VIRTUALENVS_CREATE=false
 
 COPY pyproject.toml .
-RUN poetry install --no-root --no-dev
+RUN poetry install --no-root --only main
 
 COPY . .
 

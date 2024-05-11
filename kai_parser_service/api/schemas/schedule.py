@@ -21,11 +21,11 @@ class LessonRead(BaseModel):
     discipline_type: str
     discipline_number: int
 
-    audience_number: str
-    building_number: str
+    audience_number: str | None
+    building_number: str | None
 
     department_id: int
     department_name: str
 
     teacher_name: str
-    teacher_login: str
+    teacher_login: str | None

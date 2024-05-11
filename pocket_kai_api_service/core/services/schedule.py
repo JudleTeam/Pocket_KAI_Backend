@@ -4,7 +4,7 @@ from uuid import UUID
 
 from core.entities.group import GroupEntity
 from core.entities.lesson import LessonEntity, WeekParity
-from core.entities.schedule import DayEntity, WeekEntity
+from core.entities.schedule import DayEntity, ScheduleEntity, WeekEntity
 from core.services.group import GroupServiceBase
 from core.services.lesson import LessonServiceBase
 
@@ -94,7 +94,7 @@ class ScheduleService(ScheduleServiceBase):
             if day:
                 lessons_by_week_days[day].append(lesson)
 
-        return WeekEntity(week_parity=week_parity, week_days=lessons_by_week_days)
+        return WeekEntity(parsed_at=group.schedule_parsed_at, week_parity=week_parity, week_days=lessons_by_week_days)
 
     async def get_schedule_with_week_days_by_group_id(self, group_id: UUID, week_parity: WeekParity) -> WeekEntity:
         group = await self._group_service.get_by_id(group_id)
@@ -109,11 +109,11 @@ class ScheduleService(ScheduleServiceBase):
         group: GroupEntity,
         date_from: dt.date,
         days: int
-    ) -> list[DayEntity]:
+    ) -> ScheduleEntity:
         dates = [date_from + dt.timedelta(days=x) for x in range(days + 1)]
         group_lessons = await self._lesson_service.get_by_group_id(group.id)
 
-        schedule = list()
+        schedule_days = list()
         for date in dates:
             parity = WeekParity.get_parity_for_date(date)
             schedule_day = DayEntity(
@@ -121,16 +121,16 @@ class ScheduleService(ScheduleServiceBase):
                 parity=parity,
                 lessons=self._filter_lessons_by_date(group_lessons, date),
             )
-            schedule.append(schedule_day)
+            schedule_days.append(schedule_day)
 
-        return schedule
+        return ScheduleEntity(parsed_at=group.schedule_parsed_at, days=schedule_days)
 
     async def get_schedule_with_dates_by_group_id(
         self,
         group_id: UUID,
         date_from: dt.date,
         days_count: int
-    ) -> list[DayEntity]:
+    ) -> ScheduleEntity:
         group = await self._group_service.get_by_id(group_id)
         return await self._get_schedule_with_dates_by_group(group, date_from, days_count)
 
@@ -139,6 +139,6 @@ class ScheduleService(ScheduleServiceBase):
         group_name: str,
         date_from: dt.date,
         days_count: int
-    ) -> list[DayEntity]:
+    ) -> ScheduleEntity:
         group = await self._group_service.get_by_name(group_name)
         return await self._get_schedule_with_dates_by_group(group, date_from, days_count)

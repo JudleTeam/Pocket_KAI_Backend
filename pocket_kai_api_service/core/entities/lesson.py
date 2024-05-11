@@ -6,6 +6,7 @@ from uuid import UUID
 from pydantic import Field
 
 from core.entities.base import BaseEntity
+from core.entities.department import DepartmentEntity
 from core.entities.discipline import DisciplineEntity
 from core.entities.teacher import TeacherEntity
 
@@ -18,6 +19,7 @@ class LessonType(str, Enum):
     physical_education = 'phys_edu'
     course_work = 'course_work'
     individual_task = 'ind_task'
+    military_training = 'military'
     unknown = 'unknown'
 
 
@@ -48,9 +50,10 @@ class LessonEntity(BaseEntity):
     original_lesson_type: str | None
     parsed_lesson_type: LessonType
 
-    parsed_at: dt.datetime
-
     group_id: UUID
+    discipline_id: UUID
+    teacher_id: UUID | None
 
-    discipline: DisciplineEntity
-    teacher: TeacherEntity | None
+    discipline: DisciplineEntity = None
+    teacher: TeacherEntity | None = None
+    department: DepartmentEntity = None

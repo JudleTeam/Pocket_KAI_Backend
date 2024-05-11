@@ -10,9 +10,11 @@ class GroupEntity(BaseEntity):
     pinned_text: str | None
     group_name: str
 
-    is_verified: bool
+    is_verified: bool = False
     verified_at: dt.datetime | None
     parsed_at: dt.datetime | None
+
+    schedule_parsed_at: dt.datetime | None
 
     syllabus_url: str | None
     educational_program_url: str | None

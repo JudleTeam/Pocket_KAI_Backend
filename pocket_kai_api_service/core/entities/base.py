@@ -1,9 +1,7 @@
-import uuid
 from datetime import datetime
-from typing import Annotated
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 
 class BaseEntity(BaseModel):
@@ -11,5 +9,5 @@ class BaseEntity(BaseModel):
         from_attributes=True,
     )
 
-    id: Annotated[UUID, Field(default_factory=uuid.uuid4)]
-    created_at: Annotated[datetime, Field(default_factory=datetime.utcnow)]
+    id: UUID = None
+    created_at: datetime = None

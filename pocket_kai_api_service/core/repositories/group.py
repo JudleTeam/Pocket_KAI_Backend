@@ -12,26 +12,35 @@ class GroupRepositoryBase(GenericRepository[GroupEntity], ABC):
     entity = GroupEntity
 
     @abstractmethod
-    async def suggest_by_name(self, name: str, limit: int) -> list[GroupEntity]:
+    async def create(self, group_name: str, kai_id: int) -> GroupEntity:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_by_name(self, name: str) -> GroupEntity:
+    async def suggest_by_name(self, group_name: str, limit: int) -> list[GroupEntity]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_by_name(self, group_name: str) -> GroupEntity:
         raise NotImplementedError
 
 
 class SAGroupRepository(GenericSARepository[GroupEntity], GroupRepositoryBase):
     model_cls = Group
 
-    async def suggest_by_name(self, name: str, limit: int) -> list[GroupEntity]:
-        stmt = select(Group).where(Group.group_name.startswith(name)).limit(limit)
+    async def suggest_by_name(self, group_name: str, limit: int) -> list[GroupEntity]:
+        stmt = select(Group).where(Group.group_name.startswith(group_name)).limit(limit)
         groups = await self._session.scalars(stmt)
         groups = groups.all()
         return [await self._convert_db_to_entity(group) for group in groups]
 
-    async def get_by_name(self, name: str) -> GroupEntity:
-        stmt = select(Group).where(Group.group_name == name).limit(1)
+    async def get_by_name(self, group_name: str) -> GroupEntity:
+        stmt = select(Group).where(Group.group_name == group_name).limit(1)
         group = await self._session.scalar(stmt)
         if group is None:
-            raise EntityNotFoundError(entity=GroupEntity, find_query=name)
+            raise EntityNotFoundError(entity=GroupEntity, find_query=group_name)
         return await self._convert_db_to_entity(group)
+
+    async def create(self, group_name: str, kai_id: int) -> GroupEntity:
+        new_group = Group(group_name=group_name, kai_id=kai_id)
+        await self._add(new_group)
+        return await self._convert_db_to_entity(new_group)

@@ -24,7 +24,9 @@ class Group(Base):
     is_verified: Mapped[bool] = mapped_column(default=False)
     verified_at: Mapped[datetime | None] = mapped_column(default=None)
     # Дата последнего парсинга именно для верифицированной группы, т.е. обновление участников и остального
-    parsed_at:  Mapped[datetime | None] = mapped_column(default=None)
+    parsed_at:   Mapped[datetime | None] = mapped_column(default=None)
+
+    schedule_parsed_at: Mapped[datetime | None] = mapped_column(default=None)
 
     syllabus_url:               Mapped[str | None] = mapped_column()
     educational_program_url:    Mapped[str | None] = mapped_column()
@@ -33,7 +35,7 @@ class Group(Base):
     speciality_id:  Mapped[UUID | None] = mapped_column(ForeignKey('speciality.id'))
     profile_id:     Mapped[UUID | None] = mapped_column(ForeignKey('profile.id'))
     institute_id:   Mapped[UUID | None] = mapped_column(ForeignKey('institute.id'))
-    department_id: Mapped[UUID | None] = mapped_column(ForeignKey('department.id'))
+    department_id:  Mapped[UUID | None] = mapped_column(ForeignKey('department.id'))
 
     speciality:     Mapped['Speciality'] = relationship(lazy='selectin')
     profile:        Mapped['Profile'] = relationship(lazy='selectin')
@@ -41,4 +43,4 @@ class Group(Base):
     institute:      Mapped['Institute'] = relationship(lazy='selectin')
 
     group_leader: Mapped['KAIUser'] = relationship(foreign_keys=[group_leader_id])
-    members: Mapped[list['KAIUser']] = relationship(back_populates='group', foreign_keys='[KAIUser.group_id]')
+    members:      Mapped[list['KAIUser']] = relationship(back_populates='group', foreign_keys='[KAIUser.group_id]')

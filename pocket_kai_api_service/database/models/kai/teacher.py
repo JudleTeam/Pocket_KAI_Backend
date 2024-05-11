@@ -16,7 +16,7 @@ class Teacher(Base):
     login: Mapped[str] = mapped_column(unique=True)
     name: Mapped[str] = mapped_column()
 
-    departament_id: Mapped[UUID] = mapped_column(ForeignKey('department.id'))
+    department_id: Mapped[UUID] = mapped_column(ForeignKey('department.id'))
 
     department: Mapped['Department'] = relationship(lazy='selectin')
 
