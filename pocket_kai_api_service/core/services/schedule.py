@@ -114,7 +114,7 @@ class ScheduleService(ScheduleServiceBase):
         date_from: dt.date,
         days: int
     ) -> ScheduleEntity:
-        dates = [date_from + dt.timedelta(days=x) for x in range(days + 1)]
+        dates = [date_from + dt.timedelta(days=x) for x in range(days)]
         group_lessons = await self._lesson_service.get_by_group_id(group.id)
 
         schedule_days = list()
