@@ -1,0 +1,9 @@
+services:
+  kai_parser_api:
+    container_name: kai_parser_fastapi
+    build: .
+    ports:
+      - "8002:8000"
+    restart: unless-stopped
+    volumes:
+      - ./:/app/
