@@ -19,6 +19,7 @@ phonenumbers = "^8.13.33"
 aiohttp = "^3.9.3"
 asyncpg = "^0.29.0"
 cryptography = "^42.0.5"
+orjson = "^3.10.3"
 
 
 [tool.poetry.group.dev.dependencies]

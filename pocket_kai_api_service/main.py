@@ -1,9 +1,10 @@
 from fastapi import FastAPI
+from fastapi.responses import ORJSONResponse
 from starlette.middleware.cors import CORSMiddleware
 
 from api.routers import router
 
-app = FastAPI()
+app = FastAPI(default_response_class=ORJSONResponse)
 
 origins = [
     'http://localhost',
