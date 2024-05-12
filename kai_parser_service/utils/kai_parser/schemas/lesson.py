@@ -54,6 +54,7 @@ class ParsedLesson(BaseModel):
         if self.parsed_lesson_type == LessonType.military_training:
             self.discipline_number = -1
             self.department_id = -1
+            self.department_name = 'Военный учебный центр'
             self.building_number = None
             self.audience_number = None
 
@@ -83,7 +84,7 @@ class ParsedLesson(BaseModel):
         if 'физическая культура' in self.discipline_name.lower() and self.discipline_type.lower() == 'пр':
             return LessonType.physical_education
 
-        if 'военная' in self.discipline_name.lower():
+        if 'военная подготовка' == self.discipline_name.lower().strip():
             return LessonType.military_training
 
         lesson_type_mapping = {
@@ -182,6 +183,7 @@ class ParsedLesson(BaseModel):
         return (
             dates
             .replace('ё', 'е')
+            .replace('нечет', '')
             .replace('неч', '')
             .replace('чет', '')
             .replace('2 подгр.', '')
