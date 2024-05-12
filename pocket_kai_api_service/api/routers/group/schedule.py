@@ -85,7 +85,8 @@ async def get_schedule_with_dates_by_group_id(
     """
     Возвращает список дней с парами для группы по её ID (ID из PocketKAI).
     Дни начинаются с дня переданного в параметре `date_from` (по умолчанию это будет текущий день),
-    количество дней в списке зависит от параметра `days_count`
+    количество дней в списке зависит от параметра `days_count`.
+    Если у пары есть список `parsed_dates`, то пара вернётся только если день с парой попадает в этот список.
     """
     try:
         return await schedule_service.get_schedule_with_dates_by_group_id(
@@ -115,7 +116,8 @@ async def get_schedule_with_dates_by_group_name(
     """
     Возвращает список дней с парами для группы по её имени (номеру).
     Дни начинаются с дня переданного в параметре `date_from` (по умолчанию это будет текущий день),
-    количество дней в списке зависит от параметра `days_count`
+    количество дней в списке зависит от параметра `days_count`.
+    Если у пары есть список `parsed_dates`, то пара вернётся только если день с парой попадает в этот список.
     """
     try:
         return await schedule_service.get_schedule_with_dates_by_group_name(
