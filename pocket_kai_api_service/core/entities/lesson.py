@@ -1,38 +1,14 @@
 import datetime as dt
-from enum import Enum
-from typing import Annotated, Union
+from typing import Annotated
 from uuid import UUID
 
 from pydantic import Field
 
 from core.entities.base import BaseEntity
+from core.entities.common import LessonType, ParsedDatesStatus, WeekParity
 from core.entities.department import DepartmentEntity
 from core.entities.discipline import DisciplineEntity
 from core.entities.teacher import TeacherEntity
-
-
-class LessonType(str, Enum):
-    lecture = 'lecture'
-    practice = 'practice'
-    laboratory_work = 'lab_work'
-    consultation = 'consult'
-    physical_education = 'phys_edu'
-    course_work = 'course_work'
-    individual_task = 'ind_task'
-    military_training = 'military'
-    unknown = 'unknown'
-
-
-class WeekParity(str, Enum):
-    odd = 'odd'
-    even = 'even'
-    any = 'any'
-
-    @classmethod
-    def get_parity_for_date(cls, date: dt.date) -> Union['WeekParity.even', 'WeekParity.odd']:
-        if int(date.strftime("%V")) % 2 == 1:
-            return cls.odd
-        return cls.even
 
 
 class LessonEntity(BaseEntity):
@@ -40,6 +16,7 @@ class LessonEntity(BaseEntity):
     original_dates: str | None
     parsed_parity: WeekParity
     parsed_dates: list[dt.date] | None
+    parsed_dates_status: ParsedDatesStatus
 
     start_time: dt.time
     end_time: dt.time | None

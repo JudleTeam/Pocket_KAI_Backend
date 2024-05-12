@@ -2,7 +2,8 @@ import datetime as dt
 
 from pydantic import BaseModel, ConfigDict
 
-from core.entities.lesson import LessonEntity, WeekParity
+from core.entities.lesson import LessonEntity
+from core.entities.common import WeekParity
 
 
 class ScheduleEntity(BaseModel):

@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException, Query
 from api.dependencies import ScheduleServiceDep
 from api.schemas.common import ErrorMessage
 from api.schemas.schedule import ScheduleResponse, WeekDaysResponse
-from core.entities.lesson import WeekParity
+from core.entities.common import WeekParity
 from core.exceptions.base import EntityNotFoundError
 
 router = APIRouter()

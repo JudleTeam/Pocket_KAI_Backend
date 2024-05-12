@@ -25,3 +25,8 @@ class LessonType(str, Enum):
     individual_task = 'ind_task'
     military_training = 'military'
     unknown = 'unknown'
+
+
+class ParsedDatesStatus(str, Enum):
+    GOOD = 'good'
+    NEED_CHECK = 'need_check'

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from api.dependencies import KaiParserDep
-from api.schemas.schedule import LessonRead
+from api.schemas.schedule import GroupScheduleResponse
 from utils.kai_parser.schemas.errors import KaiApiError
 
 
@@ -10,7 +10,7 @@ router = APIRouter()
 
 @router.get(
     '',
-    response_model=list[LessonRead]
+    response_model=GroupScheduleResponse
 )
 async def get_schedule(
     group_kai_id: str,

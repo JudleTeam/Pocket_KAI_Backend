@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from utils.common import LessonType, WeekParity
+from utils.common import LessonType, ParsedDatesStatus, WeekParity
 
 
 class PocketKaiGroup(BaseModel):
@@ -57,6 +57,7 @@ class PocketKaiLesson(BaseModel):
     original_dates: str | None
     parsed_parity: WeekParity
     parsed_dates: list[date] | None
+    parsed_dates_status: ParsedDatesStatus
     audience_number: str | None
     building_number: str | None
     original_lesson_type: str | None

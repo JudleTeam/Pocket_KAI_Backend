@@ -1,7 +1,7 @@
 from aiohttp import ClientSession
 
 from utils.kai_parser_api.base import KaiParserApiBase
-from utils.kai_parser_api.schemas import ParsedGroup, ParsedLesson
+from utils.kai_parser_api.schemas import ParsedGroup, ParsedGroupSchedule, ParsedLesson
 
 
 class KaiParserApi(KaiParserApiBase):
@@ -18,10 +18,10 @@ class KaiParserApi(KaiParserApiBase):
         json_response = await self._json_request('GET', url)
         return [ParsedGroup.model_validate(group_dict) for group_dict in json_response]
 
-    async def get_group_schedule(self, group_kai_id: int) -> list[ParsedLesson]:
+    async def get_group_schedule(self, group_kai_id: int) -> ParsedGroupSchedule:
         json_response = await self._json_request(
             'GET',
             url=self.base_kai_parser_url + '/schedule',
             params={'group_kai_id': group_kai_id}
         )
-        return [ParsedLesson.model_validate(lesson_dict) for lesson_dict in json_response]
+        return ParsedGroupSchedule.model_validate(json_response)

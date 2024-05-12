@@ -1,7 +1,11 @@
+import logging
+
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from api.routers import router
+
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
 

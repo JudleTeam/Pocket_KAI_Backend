@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from api.schemas.department import DepartmentRead
 from api.schemas.discipline import DisciplineRead
 from api.schemas.teacher import TeacherRead
-from core.entities.lesson import LessonType, WeekParity
+from core.entities.common import LessonType, ParsedDatesStatus, WeekParity
 
 
 class LessonRead(BaseModel):
@@ -23,6 +23,7 @@ class LessonRead(BaseModel):
     original_dates: str | None
     parsed_parity: WeekParity
     parsed_dates: list[dt.date] | None
+    parsed_dates_status: ParsedDatesStatus
     audience_number: str | None
     building_number: str | None
     original_lesson_type: str | None
@@ -40,6 +41,7 @@ class LessonCreate(BaseModel):
     original_dates: str | None
     parsed_parity: WeekParity
     parsed_dates: list[dt.date] | None
+    parsed_dates_status: ParsedDatesStatus
     audience_number: str | None
     building_number: str | None
     original_lesson_type: str | None
@@ -57,6 +59,7 @@ class LessonUpdate(BaseModel):
     original_dates: str | None
     parsed_parity: WeekParity
     parsed_dates: list[dt.date] | None
+    parsed_dates_status: ParsedDatesStatus
     audience_number: str | None
     building_number: str | None
     original_lesson_type: str | None

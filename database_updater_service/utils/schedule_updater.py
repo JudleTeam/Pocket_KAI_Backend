@@ -1,7 +1,6 @@
 import asyncio
 import logging
 from collections import defaultdict
-from datetime import datetime
 
 from utils.kai_parser_api.base import KaiParserApiBase
 from utils.kai_parser_api.schemas import ParsedGroup, ParsedLesson
@@ -58,11 +57,11 @@ class ScheduleUpdater:
         group: PocketKaiGroup,
         teachers: dict, departments: dict, disciplines: dict
     ):
-        parsed_group_lessons = await self.kai_parser_api.get_group_schedule(group.kai_id)
+        parsed_group_schedule = await self.kai_parser_api.get_group_schedule(group.kai_id)
         pocket_kai_group_lessons = await self.pocket_kai_api.get_group_lessons_by_group_id(group.id)
 
         new_lessons, lessons_to_delete = self.find_changes_in_lessons(
-            parsed_group_lessons, pocket_kai_group_lessons
+            parsed_group_schedule.lessons, pocket_kai_group_lessons
         )
         saved_new_lessons = list()
         for lesson in new_lessons:
@@ -84,7 +83,7 @@ class ScheduleUpdater:
             is_verified=group.is_verified,
             verified_at=group.verified_at,
             parsed_at=group.parsed_at,
-            schedule_parsed_at=datetime.utcnow(),  # TODO: поменять на то что приходит из апи
+            schedule_parsed_at=parsed_group_schedule.parsed_at,
             syllabus_url=group.syllabus_url,
             educational_program_url=group.educational_program_url,
             study_schedule_url=group.study_schedule_url,
@@ -126,8 +125,7 @@ class ScheduleUpdater:
                     await task
                 except Exception as e:
                     logging.error(f'Error with some group: {e}')
-            # tasks = [self.update_group_schedule(group, teachers, departments, disciplines) for group in chunk]
-            # results = await asyncio.gather(*tasks, return_exceptions=True)
+
             logging.info(f'Chunk {chunk_num}/{chunks_count} done')
 
     async def get_or_add_department(self, departments: dict, lesson: ParsedLesson):
@@ -172,12 +170,15 @@ class ScheduleUpdater:
             disciplines[discipline.kai_id] = discipline
         return disciplines[lesson.discipline_number]
 
-    async def add_group_lesson(self, lesson, group, department, teacher: PocketKaiTeacher | None, discipline):
+    async def add_group_lesson(
+        self, lesson: ParsedLesson, group, department, teacher: PocketKaiTeacher | None, discipline
+    ):
         return await self.pocket_kai_api.add_group_lesson(
             number_of_day=lesson.day_number,
             original_dates=lesson.dates,
             parsed_parity=lesson.parsed_parity,
-            parsed_dates=[],
+            parsed_dates=lesson.parsed_dates,
+            parsed_dates_status=lesson.parsed_dates_status,
             audience_number=lesson.audience_number,
             building_number=lesson.building_number,
             original_lesson_type=lesson.discipline_type,

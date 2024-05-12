@@ -3,7 +3,7 @@ import datetime as dt
 from pydantic import BaseModel, ConfigDict
 
 from api.schemas.lesson import LessonRead
-from core.entities.lesson import WeekParity
+from core.entities.common import WeekParity
 
 
 class ScheduleResponse(BaseModel):

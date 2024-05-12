@@ -4,6 +4,7 @@ from uuid import UUID
 
 from aiohttp import ClientSession
 
+from utils.common import ParsedDatesStatus
 from utils.kai_parser_api.schemas import WeekParity
 from utils.pocket_kai_api.base import PocketKaiApiBase, PocketKaiApiError
 from utils.pocket_kai_api.schemas import (
@@ -68,7 +69,7 @@ class PocketKaiApi(PocketKaiApiBase):
             'is_verified': is_verified,
             'verified_at': verified_at.isoformat() if parsed_at else None,
             'parsed_at': parsed_at.isoformat() if parsed_at else None,
-            'schedule_parsed_at': schedule_parsed_at.isoformat() if schedule_parsed_at else None,
+            'schedule_parsed_at': schedule_parsed_at.replace(tzinfo=None).isoformat() if schedule_parsed_at else None,
             'syllabus_url': syllabus_url,
             'educational_program_url': educational_program_url,
             'study_schedule_url': study_schedule_url,
@@ -154,6 +155,7 @@ class PocketKaiApi(PocketKaiApiBase):
         original_dates: str | None,
         parsed_parity: WeekParity,
         parsed_dates: list[datetime.date] | None,
+        parsed_dates_status: ParsedDatesStatus,
         audience_number: str | None,
         building_number: str | None,
         original_lesson_type: str | None,
@@ -170,7 +172,8 @@ class PocketKaiApi(PocketKaiApiBase):
             'number_of_day': number_of_day,
             'original_dates': original_dates,
             'parsed_parity': parsed_parity,
-            'parsed_dates': parsed_dates,
+            'parsed_dates': [date.isoformat() for date in parsed_dates] if parsed_dates else None,
+            'parsed_dates_status': parsed_dates_status,
             'audience_number': audience_number,
             'building_number': building_number,
             'original_lesson_type': original_lesson_type,
@@ -192,6 +195,7 @@ class PocketKaiApi(PocketKaiApiBase):
         original_dates: str | None,
         parsed_parity: WeekParity,
         parsed_dates: list[datetime.date] | None,
+        parsed_dates_status: ParsedDatesStatus,
         audience_number: str | None,
         building_number: str | None,
         original_lesson_type: str | None,
@@ -208,7 +212,8 @@ class PocketKaiApi(PocketKaiApiBase):
             'number_of_day': number_of_day,
             'original_dates': original_dates,
             'parsed_parity': parsed_parity,
-            'parsed_dates': parsed_dates,
+            'parsed_dates': [date.isoformat() for date in parsed_dates] if parsed_dates else None,
+            'parsed_dates_status': parsed_dates_status,
             'audience_number': audience_number,
             'building_number': building_number,
             'original_lesson_type': original_lesson_type,

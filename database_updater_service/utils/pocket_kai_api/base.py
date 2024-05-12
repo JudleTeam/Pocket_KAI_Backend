@@ -3,6 +3,7 @@ from abc import abstractmethod
 from typing import Protocol
 from uuid import UUID
 
+from utils.common import ParsedDatesStatus
 from utils.kai_parser_api.schemas import WeekParity
 from utils.pocket_kai_api.schemas import (
     PocketKaiDepartment, PocketKaiDiscipline, PocketKaiGroup, PocketKaiLesson, PocketKaiTeacher
@@ -89,6 +90,7 @@ class PocketKaiApiBase(Protocol):
         original_dates: str | None,
         parsed_parity: WeekParity,
         parsed_dates: list[datetime.date] | None,
+        parsed_dates_status: ParsedDatesStatus,
         audience_number: str | None,
         building_number: str | None,
         original_lesson_type: str | None,
@@ -110,6 +112,7 @@ class PocketKaiApiBase(Protocol):
         original_dates: str | None,
         parsed_parity: WeekParity,
         parsed_dates: list[datetime.date] | None,
+        parsed_dates_status: ParsedDatesStatus,
         audience_number: str | None,
         building_number: str | None,
         original_lesson_type: str | None,

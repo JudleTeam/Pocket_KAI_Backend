@@ -3,7 +3,7 @@ from functools import cached_property
 
 from pydantic import BaseModel, ConfigDict, computed_field, field_validator, model_validator
 
-from utils.kai_parser.schemas.common import LessonType, WeekParity
+from utils.kai_parser.schemas.common import LessonType, ParsedDatesStatus, WeekParity
 
 
 class ParsedLesson(BaseModel):
@@ -60,7 +60,7 @@ class ParsedLesson(BaseModel):
     @computed_field
     @cached_property
     def parsed_parity(self) -> WeekParity:
-        dates = self.dates.replace('ё', 'e')
+        dates = self.dates.replace('ё', 'e').lower()
 
         # 'нея' - typo.
         if 'нечет' in dates or 'неч' in dates or 'нея' in dates:
@@ -80,7 +80,7 @@ class ParsedLesson(BaseModel):
     @computed_field
     @cached_property
     def parsed_lesson_type(self) -> LessonType:
-        if 'физическая культура' in self.discipline_name.lower():
+        if 'физическая культура' in self.discipline_name.lower() and self.discipline_type.lower() == 'пр':
             return LessonType.physical_education
 
         if 'военная' in self.discipline_name.lower():
@@ -96,6 +96,56 @@ class ParsedLesson(BaseModel):
         }
 
         return lesson_type_mapping.get(self.discipline_type.strip().lower(), LessonType.unknown)
+
+    @computed_field
+    @cached_property
+    def parsed_dates(self) -> list[datetime.date] | None:
+        sanitized_dates = self.sanitize_dates(self.dates)
+        dates_str_list = sanitized_dates.split()
+
+        try:
+            current_year = datetime.date.today().year
+            dates = [
+                datetime.datetime.strptime(f'{date_str}.{current_year}', '%d.%m.%Y').date()
+                for date_str in dates_str_list
+            ]
+        except ValueError:
+            pass
+        else:
+            return dates
+
+        try:
+            dates = [
+                datetime.datetime.strptime(date_str, '%d.%m.%Y').date()
+                for date_str in dates_str_list
+            ]
+        except ValueError:
+            return None
+
+        if not dates:
+            return None
+
+        return dates
+
+    @computed_field
+    @cached_property
+    def parsed_dates_status(self) -> ParsedDatesStatus:
+        good_parity_variants = (
+            'неч', 'неч.нед', 'неч.нед.', 'нечет.нед.', 'нечетнаянеделя', 'неч.н', 'неч.н.', 'нечет.н', 'нечет.н.',
+            'чет', 'чет.нед', 'чет.нед.', 'четнаянеделя', 'чет.н', 'чет.н.',
+            'неч/чет', 'чет/неч', 'eжн', 'еженедельно'
+        )
+        processed_dates = self.dates.strip().replace('ё', 'е').replace(' ', '').lower()
+        if processed_dates in good_parity_variants:
+            return ParsedDatesStatus.GOOD
+
+        if '/' in self.dates or 'подг' in self.dates.lower():
+            return ParsedDatesStatus.NEED_CHECK
+
+        if self.parsed_dates is not None:
+            return ParsedDatesStatus.GOOD
+
+        return ParsedDatesStatus.NEED_CHECK
 
     @computed_field
     @cached_property
@@ -126,3 +176,25 @@ class ParsedLesson(BaseModel):
         end_time = start_time + lesson_timedelta
 
         return (datetime.datetime.min + end_time).time()
+
+    @staticmethod
+    def sanitize_dates(dates: str) -> str:
+        return (
+            dates
+            .replace('ё', 'е')
+            .replace('неч', '')
+            .replace('чет', '')
+            .replace('2 подгр', '')
+            .replace('2 подгр.', '')
+            .replace('2 подг', '')
+            .replace('2 подг.', '')
+            .replace('1 подгр', '')
+            .replace('1 подгр.', '')
+            .replace('1 подг', '')
+            .replace('1 подг.', '')
+            .replace('()', ' ')
+            .replace('/', ' ')
+            .replace(';', ' ')
+            .replace(',', ' ')
+            .strip()
+        )

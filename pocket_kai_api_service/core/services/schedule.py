@@ -3,7 +3,8 @@ from abc import ABC, abstractmethod
 from uuid import UUID
 
 from core.entities.group import GroupEntity
-from core.entities.lesson import LessonEntity, WeekParity
+from core.entities.lesson import LessonEntity
+from core.entities.common import WeekParity
 from core.entities.schedule import DayEntity, ScheduleEntity, WeekEntity
 from core.services.group import GroupServiceBase
 from core.services.lesson import LessonServiceBase
@@ -61,7 +62,10 @@ class ScheduleService(ScheduleServiceBase):
         filtered_lessons = []
 
         for lesson in group_lessons:
-            if lesson.number_of_day == day_number and lesson.parsed_parity in (WeekParity.any, date_week_parity):
+            if lesson.parsed_dates:
+                if date in lesson.parsed_dates:
+                    filtered_lessons.append(lesson)
+            elif lesson.number_of_day == day_number and lesson.parsed_parity in (WeekParity.any, date_week_parity):
                 filtered_lessons.append(lesson)
 
         return filtered_lessons

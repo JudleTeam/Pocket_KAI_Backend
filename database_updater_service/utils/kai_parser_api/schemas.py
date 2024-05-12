@@ -2,7 +2,7 @@ import datetime
 
 from pydantic import BaseModel
 
-from utils.common import LessonType, WeekParity
+from utils.common import LessonType, ParsedDatesStatus, WeekParity
 from utils.pocket_kai_api.schemas import PocketKaiGroup, PocketKaiLesson
 
 
@@ -16,11 +16,19 @@ class ParsedGroup(BaseModel):
             return self.id == other.kai_id
 
 
+class ParsedGroupSchedule(BaseModel):
+    parsed_at: datetime.datetime
+    group_kai_id: int
+    lessons: list['ParsedLesson']
+
+
 class ParsedLesson(BaseModel):
     day_number: int
     start_time: datetime.time | None
     end_time: datetime.time | None
     dates: str
+    parsed_dates: list[datetime.datetime] | None
+    parsed_dates_status: ParsedDatesStatus
     parsed_parity: WeekParity
     parsed_lesson_type: LessonType
 
@@ -44,6 +52,8 @@ class ParsedLesson(BaseModel):
                 self.start_time == other.start_time and
                 self.end_time == other.end_time and
                 self.dates == other.original_dates and
+                self.parsed_dates == other.parsed_dates and
+                self.parsed_dates_status == other.parsed_dates_status and
                 self.parsed_parity == other.parsed_parity and
                 self.parsed_lesson_type == other.parsed_lesson_type and
                 self.discipline_type == other.original_lesson_type and

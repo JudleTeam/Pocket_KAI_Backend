@@ -1,5 +1,7 @@
 import asyncio
+import logging
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from typing import Literal
 
 from aiohttp import ClientError, ClientSession
@@ -8,6 +10,7 @@ from utils.kai_parser.base import KaiParserBase
 from utils.kai_parser.schemas.errors import KaiApiError
 from utils.kai_parser.schemas.group import ParsedGroup
 from utils.kai_parser.schemas.lesson import ParsedLesson
+from utils.kai_parser.schemas.schedule import ParsedGroupSchedule
 
 
 class KaiParser(KaiParserBase):
@@ -76,7 +79,7 @@ class KaiParser(KaiParserBase):
             ) for group in groups_from_kai
         ]
 
-    async def parse_group_schedule(self, group_kai_id: int) -> list[ParsedLesson]:
+    async def parse_group_schedule(self, group_kai_id: int) -> ParsedGroupSchedule:
         params = {
             'p_p_id'         : 'pubStudentSchedule_WAR_publicStudentSchedule10',
             'p_p_lifecycle'  : 2,
@@ -86,10 +89,11 @@ class KaiParser(KaiParserBase):
             'groupId': group_kai_id
         }
 
+        parsed_at = datetime.now(timezone.utc)
         async with self._request('POST', self.schedule_url, params=params, data=data) as response:
             lessons_from_kai = await response.json(content_type='text/html')
 
-        return [
+        lessons = [
             ParsedLesson(
                 day_number=lesson.get('dayNum'),
                 start_time=lesson.get('dayTime'),
@@ -105,3 +109,10 @@ class KaiParser(KaiParserBase):
                 department_name=lesson.get('orgUnitName'),
             ) for day_lessons in lessons_from_kai.values() for lesson in day_lessons
         ]
+
+        return ParsedGroupSchedule(
+            parsed_at=parsed_at,
+            group_kai_id=group_kai_id,
+            lessons=lessons
+        )
+

@@ -4,7 +4,8 @@ from uuid import UUID
 
 from sqlalchemy import select
 
-from core.entities.lesson import LessonEntity, WeekParity
+from core.entities.lesson import LessonEntity
+from core.entities.common import ParsedDatesStatus, WeekParity
 from core.repositories.base import GenericRepository, GenericSARepository
 from database.models.kai import GroupLesson
 
@@ -19,6 +20,7 @@ class LessonRepositoryBase(GenericRepository[LessonEntity], ABC):
         original_dates: str | None,
         parsed_parity: WeekParity,
         parsed_dates: list[datetime.date] | None,
+        parsed_dates_status: ParsedDatesStatus,
         audience_number: str | None,
         building_number: str | None,
         original_lesson_type: str | None,
@@ -63,6 +65,7 @@ class SALessonRepository(GenericSARepository[LessonEntity], LessonRepositoryBase
         original_dates: str | None,
         parsed_parity: WeekParity,
         parsed_dates: list[datetime.date] | None,
+        parsed_dates_status: ParsedDatesStatus,
         audience_number: str | None,
         building_number: str | None,
         original_lesson_type: str | None,
@@ -79,6 +82,7 @@ class SALessonRepository(GenericSARepository[LessonEntity], LessonRepositoryBase
             original_dates=original_dates,
             parsed_parity=parsed_parity,
             parsed_dates=parsed_dates,
+            parsed_dates_status=parsed_dates_status,
             audience_number=audience_number,
             building_number=building_number,
             original_lesson_type=original_lesson_type,

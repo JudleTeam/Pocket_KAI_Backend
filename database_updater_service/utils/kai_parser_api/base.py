@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Protocol
 
-from utils.kai_parser_api.schemas import ParsedGroup, ParsedLesson
+from utils.kai_parser_api.schemas import ParsedGroup, ParsedGroupSchedule
 
 
 class KaiParserApiBase(Protocol):
@@ -10,5 +10,5 @@ class KaiParserApiBase(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_group_schedule(self, group_kai_id: int) -> list[ParsedLesson]:
+    async def get_group_schedule(self, group_kai_id: int) -> ParsedGroupSchedule:
         raise NotImplementedError
