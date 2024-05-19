@@ -18,7 +18,7 @@ class LessonEntity(BaseEntity):
     parsed_dates: list[dt.date] | None
     parsed_dates_status: ParsedDatesStatus
 
-    start_time: dt.time
+    start_time: dt.time | None
     end_time: dt.time | None
 
     audience_number: str | None
@@ -29,8 +29,9 @@ class LessonEntity(BaseEntity):
 
     group_id: UUID
     discipline_id: UUID
+    department_id: UUID | None
     teacher_id: UUID | None
 
     discipline: DisciplineEntity = None
     teacher: TeacherEntity | None = None
-    department: DepartmentEntity = None
+    department: DepartmentEntity | None = None

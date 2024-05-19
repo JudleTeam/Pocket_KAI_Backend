@@ -39,7 +39,7 @@ class PocketKaiTeacher(BaseModel):
     login: str
     name: str
 
-    department: PocketKaiDepartment
+    department: PocketKaiDepartment | None
 
 
 class PocketKaiDiscipline(BaseModel):
@@ -62,9 +62,9 @@ class PocketKaiLesson(BaseModel):
     building_number: str | None
     original_lesson_type: str | None
     parsed_lesson_type: LessonType
-    start_time: time
+    start_time: time | None
     end_time: time | None
 
     teacher: PocketKaiTeacher | None
-    department: PocketKaiDepartment
+    department: PocketKaiDepartment | None
     discipline: PocketKaiDiscipline

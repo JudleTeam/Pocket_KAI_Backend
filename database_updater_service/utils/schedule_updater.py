@@ -5,7 +5,7 @@ from collections import defaultdict
 from utils.kai_parser_api.base import KaiParserApiBase
 from utils.kai_parser_api.schemas import ParsedGroup, ParsedLesson
 from utils.pocket_kai_api.base import PocketKaiApiBase
-from utils.pocket_kai_api.schemas import PocketKaiGroup, PocketKaiLesson, PocketKaiTeacher
+from utils.pocket_kai_api.schemas import PocketKaiDepartment, PocketKaiGroup, PocketKaiLesson, PocketKaiTeacher
 
 
 class ScheduleUpdater:
@@ -55,7 +55,7 @@ class ScheduleUpdater:
     async def update_group_schedule(
         self,
         group: PocketKaiGroup,
-        teachers: dict, departments: dict, disciplines: dict
+        teachers: dict, departments: dict, disciplines: dict, 
     ):
         parsed_group_schedule = await self.kai_parser_api.get_group_schedule(group.kai_id)
         pocket_kai_group_lessons = await self.pocket_kai_api.get_group_lessons_by_group_id(group.id)
@@ -65,7 +65,7 @@ class ScheduleUpdater:
         )
         saved_new_lessons = list()
         for lesson in new_lessons:
-            department = await self.get_or_add_department(departments, lesson)
+            department = await self.get_or_add_department(departments, lesson, )
             teacher = await self.get_or_add_teacher(teachers, lesson, department)
             discipline = await self.get_or_add_discipline(disciplines, lesson)
 
@@ -128,7 +128,10 @@ class ScheduleUpdater:
 
             logging.info(f'Chunk {chunk_num}/{chunks_count} done')
 
-    async def get_or_add_department(self, departments: dict, lesson: ParsedLesson):
+    async def get_or_add_department(self, departments: dict, lesson: ParsedLesson) -> PocketKaiDepartment | None:
+        if lesson.department_id is None:
+            return None
+
         if not departments[lesson.department_id]:
             department = await self.pocket_kai_api.get_department_by_kai_id(lesson.department_id)
             if department is None:
@@ -152,7 +155,7 @@ class ScheduleUpdater:
                 teacher = await self.pocket_kai_api.create_or_get_teacher_by_login(
                     login=lesson.teacher_login,
                     name=lesson.teacher_name,
-                    department_id=department.id
+                    department_id=department.id if department else None
                 )
                 logging.info('New teacher added')
             teachers[teacher.login] = teacher
@@ -187,7 +190,7 @@ class ScheduleUpdater:
             end_time=lesson.end_time,
             discipline_id=discipline.id,
             teacher_id=teacher.id if teacher else None,
-            department_id=department.id,
+            department_id=department.id if department else None,
             group_id=group.id,
         )
 

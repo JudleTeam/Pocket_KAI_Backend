@@ -28,11 +28,11 @@ class LessonRead(BaseModel):
     building_number: str | None
     original_lesson_type: str | None
     parsed_lesson_type: LessonType
-    start_time: dt.time
+    start_time: dt.time | None
     end_time: dt.time | None
 
     teacher: TeacherRead | None
-    department: DepartmentRead
+    department: DepartmentRead | None
     discipline: DisciplineRead
 
 
@@ -46,11 +46,11 @@ class LessonCreate(BaseModel):
     building_number: str | None
     original_lesson_type: str | None
     parsed_lesson_type: LessonType | None
-    start_time: dt.time
+    start_time: dt.time | None
     end_time: dt.time | None
     discipline_id: UUID
     teacher_id: UUID | None
-    department_id: UUID
+    department_id: UUID | None
     group_id: UUID
 
 
@@ -64,9 +64,9 @@ class LessonUpdate(BaseModel):
     building_number: str | None
     original_lesson_type: str | None
     parsed_lesson_type: LessonType | None
-    start_time: dt.time
+    start_time: dt.time | None
     end_time: dt.time | None
     discipline_id: UUID
     teacher_id: UUID | None
-    department_id: UUID
+    department_id: UUID | None
     group_id: UUID

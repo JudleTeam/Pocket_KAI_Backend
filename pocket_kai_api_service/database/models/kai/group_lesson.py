@@ -25,15 +25,15 @@ class GroupLesson(Base):
     building_number:         Mapped[str | None] = mapped_column()
     original_lesson_type:    Mapped[str | None] = mapped_column()
     parsed_lesson_type:      Mapped[str] = mapped_column()
-    start_time:              Mapped[time] = mapped_column()
+    start_time:              Mapped[time | None] = mapped_column()
     end_time:                Mapped[time | None] = mapped_column()
 
     discipline_id:  Mapped[UUID] = mapped_column(ForeignKey('discipline.id'))
-    department_id:  Mapped[UUID] = mapped_column(ForeignKey('department.id'))
+    department_id:  Mapped[UUID | None] = mapped_column(ForeignKey('department.id'))
     teacher_id:     Mapped[UUID | None] = mapped_column(ForeignKey('teacher.id'))
     group_id:       Mapped[UUID] = mapped_column(ForeignKey('group.id'))
 
-    department: Mapped['Department'] = relationship(lazy='selectin')
+    department: Mapped[Optional['Department']] = relationship(lazy='selectin')
     discipline: Mapped['Discipline'] = relationship(lazy='selectin')
     # Если teacher = None, значит стоит "Преподаватель кафедры"
     teacher: Mapped[Optional['Teacher']] = relationship(lazy='selectin')

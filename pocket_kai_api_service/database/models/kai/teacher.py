@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import ForeignKey, text, select, func, or_
@@ -16,9 +16,9 @@ class Teacher(Base):
     login: Mapped[str] = mapped_column(unique=True)
     name: Mapped[str] = mapped_column()
 
-    department_id: Mapped[UUID] = mapped_column(ForeignKey('department.id'))
+    department_id: Mapped[UUID | None] = mapped_column(ForeignKey('department.id'))
 
-    department: Mapped['Department'] = relationship(lazy='selectin')
+    department: Mapped[Optional['Department']] = relationship(lazy='selectin')
 
     @classmethod
     async def search_by_name(cls, session, name, similarity=0.3, limit=50, offset=0):

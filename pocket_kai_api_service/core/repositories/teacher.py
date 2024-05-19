@@ -40,7 +40,7 @@ class SATeacherRepository(GenericSARepository[TeacherEntity], TeacherRepositoryB
         self,
         login: str,
         name: str,
-        department_id: UUID
+        department_id: UUID | None
     ) -> TeacherEntity:
         new_teacher = Teacher(login=login, name=name, department_id=department_id)
         await self._add(new_teacher)

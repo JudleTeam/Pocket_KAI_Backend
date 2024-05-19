@@ -36,8 +36,8 @@ class LessonRead(BaseModel):
     audience_number: str | None
     building_number: str | None
 
-    department_id: int
-    department_name: str
+    department_id: int | None
+    department_name: str | None
 
     teacher_name: str
     teacher_login: str | None

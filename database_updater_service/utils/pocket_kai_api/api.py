@@ -31,7 +31,8 @@ class PocketKaiApi(PocketKaiApiBase):
 
             if not response.ok:
                 logging.error(f'Pocket kai api request failed. Method: {method}, URL: {url}, Status code: {response.status}\n'
-                              f'Params: {params}, Data: {json}')
+                              f'Params: {params}, Data: {json}\n'
+                              f'Answer: {await response.text()}')
                 raise PocketKaiApiError(status_code=response.status)
 
             return await response.json()
@@ -131,12 +132,12 @@ class PocketKaiApi(PocketKaiApiBase):
         result = await self._json_request('get', url)
         return PocketKaiTeacher(**result) if result else None
 
-    async def add_teacher(self, login: str, name: str, department_id: UUID) -> PocketKaiTeacher:
+    async def add_teacher(self, login: str, name: str, department_id: UUID | None) -> PocketKaiTeacher:
         url = self.base_pocket_kai_url + '/teacher'
         data = {
             'login': login,
             'name': name,
-            'department_id': str(department_id)
+            'department_id': str(department_id) if department_id else None
         }
         result = await self._json_request('post', url, json=data)
         return PocketKaiTeacher(**result)
@@ -164,7 +165,7 @@ class PocketKaiApi(PocketKaiApiBase):
         end_time: datetime.time | None,
         discipline_id: UUID,
         teacher_id: UUID | None,
-        department_id: UUID,
+        department_id: UUID | None,
         group_id: UUID,
     ) -> PocketKaiLesson:
         url = self.base_pocket_kai_url + '/lesson'
@@ -182,7 +183,7 @@ class PocketKaiApi(PocketKaiApiBase):
             'end_time': end_time.isoformat() if end_time else None,
             'discipline_id': str(discipline_id),
             'teacher_id': str(teacher_id) if teacher_id else None,
-            'department_id': str(department_id),
+            'department_id': str(department_id) if department_id else None,
             'group_id': str(group_id),
         }
         result = await self._json_request('post', url, json=data)
@@ -204,7 +205,7 @@ class PocketKaiApi(PocketKaiApiBase):
         end_time: datetime.time | None,
         discipline_id: UUID,
         teacher_id: UUID | None,
-        department_id: UUID,
+        department_id: UUID | None,
         group_id: UUID,
     ) -> PocketKaiLesson:
         url = self.base_pocket_kai_url + f'/lesson/{lesson_id}'
@@ -222,7 +223,7 @@ class PocketKaiApi(PocketKaiApiBase):
             'end_time': end_time.isoformat(),
             'discipline_id': str(discipline_id),
             'teacher_id'   : str(teacher_id) if teacher_id else None,
-            'department_id': str(department_id),
+            'department_id': str(department_id) if department_id else None,
             'group_id'     : str(group_id),
         }
         result = await self._json_request('put', url, json=data)

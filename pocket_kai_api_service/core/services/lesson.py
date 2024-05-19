@@ -3,7 +3,7 @@ from abc import abstractmethod
 from typing import Protocol
 from uuid import UUID
 
-from api.schemas.lesson import LessonUpdate
+from api.schemas.lesson import LessonCreate, LessonUpdate
 from core.entities.lesson import LessonEntity
 from core.entities.common import ParsedDatesStatus, WeekParity
 from core.repositories.lesson import LessonRepositoryBase
@@ -24,24 +24,7 @@ class LessonServiceBase(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    async def create(
-        self,
-        number_of_day: int,
-        original_dates: str | None,
-        parsed_parity: WeekParity,
-        parsed_dates: list[datetime.date] | None,
-        parsed_dates_status: ParsedDatesStatus,
-        audience_number: str | None,
-        building_number: str | None,
-        original_lesson_type: str | None,
-        parsed_lesson_type: str | None,
-        start_time: datetime.time,
-        end_time: datetime.time | None,
-        discipline_id: UUID,
-        teacher_id: UUID,
-        department_id: UUID,
-        group_id: UUID
-    ) -> LessonEntity:
+    async def create(self, lesson_create: LessonCreate) -> LessonEntity:
         raise NotImplementedError
 
     @abstractmethod
@@ -57,40 +40,23 @@ class LessonService(LessonServiceBase):
     async def get_by_group_id(self, group_id: UUID, week_parity: WeekParity = WeekParity.any) -> list[LessonEntity]:
         return await self.lesson_repository.get_by_group_id(group_id, week_parity=week_parity)
 
-    async def create(
-        self,
-        number_of_day: int,
-        original_dates: str | None,
-        parsed_parity: WeekParity,
-        parsed_dates: list[datetime.date] | None,
-        parsed_dates_status: ParsedDatesStatus,
-        audience_number: str | None,
-        building_number: str | None,
-        original_lesson_type: str | None,
-        parsed_lesson_type: str | None,
-        start_time: datetime.time,
-        end_time: datetime.time | None,
-        discipline_id: UUID,
-        teacher_id: UUID,
-        department_id: UUID,
-        group_id: UUID
-    ) -> LessonEntity:
+    async def create(self, lesson_create: LessonCreate) -> LessonEntity:
         lesson = await self.lesson_repository.create(
-            number_of_day=number_of_day,
-            original_dates=original_dates,
-            parsed_parity=parsed_parity,
-            parsed_dates=parsed_dates,
-            parsed_dates_status=parsed_dates_status,
-            audience_number=audience_number,
-            building_number=building_number,
-            original_lesson_type=original_lesson_type,
-            parsed_lesson_type=parsed_lesson_type,
-            start_time=start_time,
-            end_time=end_time,
-            discipline_id=discipline_id,
-            teacher_id=teacher_id,
-            department_id=department_id,
-            group_id=group_id
+            number_of_day=lesson_create.number_of_day,
+            original_dates=lesson_create.original_dates,
+            parsed_parity=lesson_create.parsed_parity,
+            parsed_dates=lesson_create.parsed_dates,
+            parsed_dates_status=lesson_create.parsed_dates_status,
+            audience_number=lesson_create.audience_number,
+            building_number=lesson_create.building_number,
+            original_lesson_type=lesson_create.original_lesson_type,
+            parsed_lesson_type=lesson_create.parsed_lesson_type,
+            start_time=lesson_create.start_time,
+            end_time=lesson_create.end_time,
+            discipline_id=lesson_create.discipline_id,
+            teacher_id=lesson_create.teacher_id,
+            department_id=lesson_create.department_id,
+            group_id=lesson_create.group_id
         )
         await self.uow.commit()
         return lesson

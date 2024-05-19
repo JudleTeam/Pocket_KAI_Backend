@@ -16,11 +16,11 @@ class TeacherRead(BaseModel):
     login: str
     name: str
 
-    department: DepartmentRead
+    department: DepartmentRead | None
 
 
 class TeacherCreate(BaseModel):
     login: str
     name: str
 
-    department_id: UUID
+    department_id: UUID | None

@@ -21,7 +21,7 @@ async def create_lesson(
     lesson_service: LessonServiceDep
 ):
     try:
-        return await lesson_service.create(**lesson_create.model_dump())
+        return await lesson_service.create(lesson_create)
     except BadRelatedEntityError:
         raise HTTPException(
             status_code=400,

@@ -7,4 +7,4 @@ class TeacherEntity(BaseEntity):
     login: str
     name: str
 
-    department: DepartmentEntity
+    department: DepartmentEntity | None

@@ -1,5 +1,6 @@
 import datetime
 from functools import cached_property
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, computed_field, field_validator, model_validator
 
@@ -22,16 +23,23 @@ class ParsedLesson(BaseModel):
     audience_number: str | None
     building_number: str | None
 
-    department_id: int
-    department_name: str
+    department_id: int | None
+    department_name: str | None
 
     teacher_name: str
     teacher_login: str | None
 
-    @field_validator('audience_number')
+    @field_validator('audience_number', 'building_number')
     @classmethod
     def remove_dashes(cls, value: str) -> str:
         return value.replace('-', '')
+
+    @field_validator('audience_number', 'building_number', 'department_name')
+    @classmethod
+    def empty_to_none(cls, value: Any) -> Any | None:
+        if not value:
+            return None
+        return value
 
     @field_validator('teacher_name')
     @classmethod
@@ -48,6 +56,9 @@ class ParsedLesson(BaseModel):
 
     @model_validator(mode='after')
     def validate_model(self):
+        if not self.department_id and not self.department_name:
+            self.department_id = self.department_name = None
+
         if self.teacher_name.lower() == 'преподаватель кафедры':
             self.teacher_login = None
 
@@ -55,8 +66,6 @@ class ParsedLesson(BaseModel):
             self.discipline_number = -1
             self.department_id = -1
             self.department_name = 'Военный учебный центр'
-            self.building_number = None
-            self.audience_number = None
 
     @computed_field
     @cached_property
@@ -155,7 +164,7 @@ class ParsedLesson(BaseModel):
             return None
 
         if self.parsed_lesson_type == LessonType.military_training:
-            return datetime.time(hour=18, minute=0)
+            return None
 
         start_times = (
             datetime.timedelta(hours=8, minutes=00),

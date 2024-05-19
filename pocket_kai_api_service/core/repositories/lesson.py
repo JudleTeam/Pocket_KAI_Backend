@@ -74,7 +74,7 @@ class SALessonRepository(GenericSARepository[LessonEntity], LessonRepositoryBase
         end_time: datetime.time | None,
         discipline_id: UUID,
         teacher_id: UUID,
-        department_id: UUID,
+        department_id: UUID | None,
         group_id: UUID
     ) -> LessonEntity:
         new_lesson = GroupLesson(
