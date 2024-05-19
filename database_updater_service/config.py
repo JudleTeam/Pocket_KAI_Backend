@@ -13,5 +13,7 @@ class Settings(BaseSettings):
 
     kai_parser_url: str
 
+    timezone: str = 'Europe/Moscow'
+
 
 settings = Settings()

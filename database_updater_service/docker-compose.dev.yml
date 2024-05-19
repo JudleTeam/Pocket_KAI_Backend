@@ -1,5 +1,9 @@
-version: '3.7'
-
 services:
-  database_updater:
-    build: .
+  database_updater_service:
+    container_name: database_updater
+    build:
+      dockerfile: ../database_updater_service/Dockerfile
+      context: ../database_updater_service
+    restart: unless-stopped
+    volumes:
+      - ../database_updater_service:/app/

@@ -30,18 +30,20 @@ async def update_schedule():
 
 
 async def start_schedulers():
-    scheduler = AsyncScheduler()
+    async with AsyncScheduler() as scheduler:
+        await scheduler.add_schedule(
+            update_schedule,
+            CronTrigger(hour=3, minute=0, timezone=settings.timezone),
+        )
 
-    await scheduler.add_schedule(
-        update_schedule,
-        CronTrigger(hour=3, minute=0, timezone=settings.timezone),
-    )
+        await scheduler.run_until_stopped()
 
 
 async def main():
-    logging.basicConfig(level=logging.INFO)
-    await update_schedule()
+    await start_schedulers()
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
+
     asyncio.run(main())
