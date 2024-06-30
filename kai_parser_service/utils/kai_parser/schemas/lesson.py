@@ -122,7 +122,7 @@ class ParsedLesson(BaseModel):
         except ValueError:
             pass
         else:
-            return dates
+            return dates or None
 
         try:
             dates = [
@@ -132,10 +132,7 @@ class ParsedLesson(BaseModel):
         except ValueError:
             return None
 
-        if not dates:
-            return None
-
-        return dates
+        return dates or None
 
     @computed_field
     @cached_property

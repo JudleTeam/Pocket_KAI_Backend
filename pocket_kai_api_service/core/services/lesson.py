@@ -77,6 +77,7 @@ class LessonService(LessonServiceBase):
             parsed_lesson_type=lesson_update.parsed_lesson_type,
             group_id=lesson_update.group_id,
             discipline_id=lesson_update.discipline_id,
+            department_id=lesson_update.department_id,
             teacher_id=lesson_update.teacher_id,
         )
         updated_lesson = await self.lesson_repository.update(lesson_entity)

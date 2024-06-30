@@ -27,7 +27,7 @@ class ParsedLesson(BaseModel):
     start_time: datetime.time | None
     end_time: datetime.time | None
     dates: str
-    parsed_dates: list[datetime.datetime] | None
+    parsed_dates: list[datetime.date] | None
     parsed_dates_status: ParsedDatesStatus
     parsed_parity: WeekParity
     parsed_lesson_type: LessonType

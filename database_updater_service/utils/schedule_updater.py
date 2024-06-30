@@ -1,7 +1,10 @@
+from pprint import pprint
+
 import asyncio
 import logging
 from collections import defaultdict
 
+from utils.helper import find_changes_in_lessons
 from utils.kai_parser_api.base import KaiParserApiBase
 from utils.kai_parser_api.schemas import ParsedGroup, ParsedLesson
 from utils.pocket_kai_api.base import PocketKaiApiBase
@@ -38,19 +41,6 @@ class ScheduleUpdater:
 
         return new_pocket_kai_groups
 
-    @staticmethod
-    def find_changes_in_lessons(parsed_lessons: list[ParsedLesson], pocket_kai_lessons: list[PocketKaiLesson]):
-        new_lessons = list()
-        lessons_to_delete = list()
-        for parsed_lesson in parsed_lessons:
-            if all(parsed_lesson != pocket_kai_lesson for pocket_kai_lesson in pocket_kai_lessons):
-                new_lessons.append(parsed_lesson)
-
-        for pocket_kai_lesson in pocket_kai_lessons:
-            if all(parsed_lesson != pocket_kai_lesson for parsed_lesson in parsed_lessons):
-                lessons_to_delete.append(pocket_kai_lesson)
-
-        return new_lessons, lessons_to_delete
 
     async def update_group_schedule(
         self,
@@ -60,12 +50,50 @@ class ScheduleUpdater:
         parsed_group_schedule = await self.kai_parser_api.get_group_schedule(group.kai_id)
         pocket_kai_group_lessons = await self.pocket_kai_api.get_group_lessons_by_group_id(group.id)
 
-        new_lessons, lessons_to_delete = self.find_changes_in_lessons(
+        unchanged_lessons, changed_lessons, lessons_to_add, lessons_to_delete = find_changes_in_lessons(
             parsed_group_schedule.lessons, pocket_kai_group_lessons
         )
+
+        logging.info(f'Group: {group.group_name} | {len(unchanged_lessons)} unchanged lessons |  {len(changed_lessons)} changed lessons | {len(lessons_to_add)} new lessons | {len(lessons_to_delete)} deleted lessons')
+        if changed_lessons:
+            logging.info(f'Changed lessons: {changed_lessons}')
+
+        for changed_lesson in changed_lessons:
+            old_lesson = changed_lesson['old']
+            new_lesson = changed_lesson['new']
+
+            if 'teacher_login' in changed_lesson['differences']:
+                teacher = await self.get_or_add_teacher(teachers, new_lesson, old_lesson.department)
+            else:
+                teacher = old_lesson.teacher
+
+            if 'department_id' in changed_lesson['differences']:
+                department = await self.get_or_add_department(departments, new_lesson)
+            else:
+                department = old_lesson.department
+
+            await self.pocket_kai_api.update_group_lesson(
+                lesson_id=old_lesson.id,
+                number_of_day=new_lesson.day_number,
+                original_dates=new_lesson.dates,
+                parsed_parity=new_lesson.parsed_parity,
+                parsed_dates=new_lesson.parsed_dates,
+                parsed_dates_status=new_lesson.parsed_dates_status,
+                audience_number=new_lesson.audience_number,
+                building_number=new_lesson.building_number,
+                original_lesson_type=new_lesson.discipline_type,
+                parsed_lesson_type=new_lesson.parsed_lesson_type,
+                start_time=new_lesson.start_time,
+                end_time=new_lesson.end_time,
+                discipline_id=old_lesson.discipline.id,
+                teacher_id=teacher.id if teacher else None,
+                department_id=department.id if department else None,
+                group_id=old_lesson.group_id,
+            )
+
         saved_new_lessons = list()
-        for lesson in new_lessons:
-            department = await self.get_or_add_department(departments, lesson, )
+        for lesson in lessons_to_add:
+            department = await self.get_or_add_department(departments, lesson)
             teacher = await self.get_or_add_teacher(teachers, lesson, department)
             discipline = await self.get_or_add_discipline(disciplines, lesson)
 

@@ -9,4 +9,4 @@ down_all:
 	docker compose -f $(KAI_PARSER_DC) -f $(POCKET_KAI_API_DC) -f $(DATABASE_UPDATER_DC) down
 
 update_schedule:
-	docker exec database_updater poetry run python cli.py update_schedule
+	docker exec -it database_updater poetry run python cli.py update_schedule

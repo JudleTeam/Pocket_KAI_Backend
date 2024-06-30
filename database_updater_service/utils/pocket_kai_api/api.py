@@ -220,7 +220,7 @@ class PocketKaiApi(PocketKaiApiBase):
             'original_lesson_type': original_lesson_type,
             'parsed_lesson_type': parsed_lesson_type,
             'start_time': start_time.isoformat(),
-            'end_time': end_time.isoformat(),
+            'end_time': end_time.isoformat() if end_time else None,
             'discipline_id': str(discipline_id),
             'teacher_id'   : str(teacher_id) if teacher_id else None,
             'department_id': str(department_id) if department_id else None,
