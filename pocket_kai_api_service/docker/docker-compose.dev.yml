@@ -1,23 +1,26 @@
 services:
   pocket_kai_api:
     container_name: pocket_kai_fastapi
-    build: .
+    build:
+      dockerfile: docker/Dockerfile
+      context: ..
+      target: development
     ports:
       - "8001:8000"
     restart: unless-stopped
     env_file:
-      - .env
+      - ../.env
     depends_on:
       - pocket_kai_postgres
     volumes:
-      - ./:/app/
+      - ../:/app/
 
   pocket_kai_postgres:
     image: postgres:16-alpine
     container_name: pocket_kai_postgres
     restart: always
     env_file:
-      - .env
+      - ../.env
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     ports:

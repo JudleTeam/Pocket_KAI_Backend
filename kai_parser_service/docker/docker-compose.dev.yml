@@ -2,10 +2,11 @@ services:
   kai_parser_api:
     container_name: kai_parser_fastapi
     build:
-      dockerfile: ../kai_parser_service/Dockerfile
-      context: ../kai_parser_service
+      dockerfile: docker/Dockerfile
+      context: ..
+      target: development
     ports:
       - "8002:8000"
     restart: unless-stopped
     volumes:
-      - ../kai_parser_service:/app/
+      - ../:/app/

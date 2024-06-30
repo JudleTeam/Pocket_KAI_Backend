@@ -1,0 +1,10 @@
+services:
+  database_updater_service:
+    container_name: database_updater
+    build:
+      dockerfile: docker/Dockerfile
+      context: ..
+      target: development
+    restart: unless-stopped
+    volumes:
+      - ../:/app/
