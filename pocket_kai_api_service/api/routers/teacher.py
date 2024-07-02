@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
-from starlette import status
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from api.dependencies import check_service_token, TeacherServiceDep
 from api.schemas.teacher import TeacherCreate, TeacherRead

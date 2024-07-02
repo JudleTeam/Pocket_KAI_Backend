@@ -1,7 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
-from starlette import status
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from api.dependencies import LessonServiceDep, check_service_token
 from api.schemas.lesson import LessonCreate, LessonRead, LessonUpdate

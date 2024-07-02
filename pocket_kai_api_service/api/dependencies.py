@@ -1,7 +1,6 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, Header
-from starlette import status
+from fastapi import Depends, HTTPException, Header, status
 
 from core.exceptions.base import EntityNotFoundError
 from core.services.department import DepartmentServiceBase
