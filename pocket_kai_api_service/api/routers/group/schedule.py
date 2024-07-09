@@ -34,7 +34,7 @@ async def get_week_schedule_by_group_name(
     Можно передать чётность недели. Пары, у которых чётность определилась как чёт/неч, возвращаются *всегда*
     """
     try:
-        return await schedule_service.get_schedule_with_week_days_by_group_name(group_name, week_parity=week_parity)
+        return await schedule_service.get_week_schedule_by_group_name(group_name, week_parity=week_parity)
     except EntityNotFoundError as error:
         raise HTTPException(status_code=404, detail=str(error))
 
@@ -60,7 +60,7 @@ async def get_week_schedule_by_group_id(
     Можно передать чётность недели. Пары, у которых чётность определилась как чёт/неч, возвращаются *всегда*
     """
     try:
-        return await schedule_service.get_schedule_with_week_days_by_group_id(group_id, week_parity=week_parity)
+        return await schedule_service.get_week_schedule_by_group_id(group_id, week_parity=week_parity)
     except EntityNotFoundError as error:
         raise HTTPException(status_code=404, detail=str(error))
 
