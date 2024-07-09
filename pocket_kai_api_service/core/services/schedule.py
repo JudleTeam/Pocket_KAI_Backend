@@ -2,22 +2,22 @@ import datetime as dt
 from abc import ABC, abstractmethod
 from uuid import UUID
 
+from api.schemas.schedule import DayResponse, ScheduleResponse, WeekDaysResponse
 from core.entities.group import GroupEntity
 from core.entities.lesson import LessonEntity
 from core.entities.common import WeekParity
-from core.entities.schedule import DayEntity, ScheduleEntity, WeekEntity
-from core.services.group import GroupServiceBase
-from core.services.lesson import LessonServiceBase
+from core.repositories.group import GroupRepositoryBase
+from core.repositories.lesson import LessonRepositoryBase
 
 
 class ScheduleServiceBase(ABC):
     def __init__(
         self,
-        lesson_service: LessonServiceBase,
-        group_service: GroupServiceBase
+        lesson_repository: LessonRepositoryBase,
+        group_repository: GroupRepositoryBase
     ):
-        self._lesson_service = lesson_service
-        self._group_service = group_service
+        self.lesson_repository = lesson_repository
+        self.group_repository = group_repository
 
     @abstractmethod
     async def get_schedule_with_dates_by_group_id(
@@ -25,7 +25,7 @@ class ScheduleServiceBase(ABC):
         group_id: UUID,
         date_from: dt.date,
         days_count: int
-    ) -> list[DayEntity]:
+    ) -> list[DayResponse]:
         raise NotImplementedError
 
     @abstractmethod
@@ -34,23 +34,23 @@ class ScheduleServiceBase(ABC):
         group_name: str,
         date_from: dt.date,
         days_count: int
-    ) -> list[DayEntity]:
+    ) -> list[DayResponse]:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_schedule_with_week_days_by_group_id(
+    async def get_week_schedule_by_group_id(
         self,
         group_id: UUID,
         week_parity: WeekParity
-    ) -> WeekEntity:
+    ) -> WeekDaysResponse:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_schedule_with_week_days_by_group_name(
+    async def get_week_schedule_by_group_name(
         self,
         group_name: str,
         week_parity: WeekParity
-    ) -> WeekEntity:
+    ) -> WeekDaysResponse:
         raise NotImplementedError
 
 
@@ -70,8 +70,8 @@ class ScheduleService(ScheduleServiceBase):
 
         return filtered_lessons
 
-    async def _get_schedule_with_week_days_by_group(self, group: GroupEntity, week_parity: WeekParity) -> WeekEntity:
-        group_lessons = await self._lesson_service.get_by_group_id(group.id, week_parity=week_parity)
+    async def _get_schedule_with_week_days_by_group(self, group: GroupEntity, week_parity: WeekParity) -> WeekDaysResponse:
+        group_lessons = await self.lesson_repository.get_by_group_id(group.id, week_parity=week_parity)
 
         lessons_by_week_days = {
             'monday'   : [],
@@ -98,14 +98,18 @@ class ScheduleService(ScheduleServiceBase):
             if day:
                 lessons_by_week_days[day].append(lesson)
 
-        return WeekEntity(parsed_at=group.schedule_parsed_at, week_parity=week_parity, week_days=lessons_by_week_days)
+        return WeekDaysResponse(
+            parsed_at=group.schedule_parsed_at,
+            week_parity=week_parity,
+            week_days=lessons_by_week_days
+        )
 
-    async def get_schedule_with_week_days_by_group_id(self, group_id: UUID, week_parity: WeekParity) -> WeekEntity:
-        group = await self._group_service.get_by_id(group_id)
+    async def get_week_schedule_by_group_id(self, group_id: UUID, week_parity: WeekParity) -> WeekDaysResponse:
+        group = await self.group_repository.get_by_id(group_id)
         return await self._get_schedule_with_week_days_by_group(group, week_parity=week_parity)
 
-    async def get_schedule_with_week_days_by_group_name(self, group_name: str, week_parity: WeekParity) -> WeekEntity:
-        group = await self._group_service.get_by_name(group_name)
+    async def get_week_schedule_by_group_name(self, group_name: str, week_parity: WeekParity) -> WeekDaysResponse:
+        group = await self.group_repository.get_by_name(group_name)
         return await self._get_schedule_with_week_days_by_group(group, week_parity=week_parity)
 
     async def _get_schedule_with_dates_by_group(
@@ -113,29 +117,29 @@ class ScheduleService(ScheduleServiceBase):
         group: GroupEntity,
         date_from: dt.date,
         days: int
-    ) -> ScheduleEntity:
+    ) -> ScheduleResponse:
         dates = [date_from + dt.timedelta(days=x) for x in range(days)]
-        group_lessons = await self._lesson_service.get_by_group_id(group.id)
+        group_lessons = await self.lesson_repository.get_by_group_id(group.id)
 
         schedule_days = list()
         for date in dates:
             parity = WeekParity.get_parity_for_date(date)
-            schedule_day = DayEntity(
+            schedule_day = DayResponse(
                 date=date,
                 parity=parity,
                 lessons=self._filter_lessons_by_date(group_lessons, date),
             )
             schedule_days.append(schedule_day)
 
-        return ScheduleEntity(parsed_at=group.schedule_parsed_at, days=schedule_days)
+        return ScheduleResponse(parsed_at=group.schedule_parsed_at, days=schedule_days)
 
     async def get_schedule_with_dates_by_group_id(
         self,
         group_id: UUID,
         date_from: dt.date,
         days_count: int
-    ) -> ScheduleEntity:
-        group = await self._group_service.get_by_id(group_id)
+    ) -> ScheduleResponse:
+        group = await self.group_repository.get_by_id(group_id)
         return await self._get_schedule_with_dates_by_group(group, date_from, days_count)
 
     async def get_schedule_with_dates_by_group_name(
@@ -143,6 +147,6 @@ class ScheduleService(ScheduleServiceBase):
         group_name: str,
         date_from: dt.date,
         days_count: int
-    ) -> ScheduleEntity:
-        group = await self._group_service.get_by_name(group_name)
+    ) -> ScheduleResponse:
+        group = await self.group_repository.get_by_name(group_name)
         return await self._get_schedule_with_dates_by_group(group, date_from, days_count)

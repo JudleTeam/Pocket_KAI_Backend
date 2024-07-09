@@ -45,10 +45,10 @@ def get_lesson_service(
 
 
 def get_schedule_service(
-    lesson_service: Annotated[LessonServiceBase, Depends(get_lesson_service)],
-    group_service: Annotated[GroupServiceBase, Depends(get_group_service)],
+    lesson_repository: Annotated[LessonRepositoryBase, Depends(get_lesson_repository)],
+    group_repository: Annotated[GroupRepositoryBase, Depends(get_group_repository)],
 ) -> ScheduleServiceBase:
-    return ScheduleService(lesson_service=lesson_service, group_service=group_service)
+    return ScheduleService(lesson_repository=lesson_repository, group_repository=group_repository)
 
 
 def get_service_token_service(
