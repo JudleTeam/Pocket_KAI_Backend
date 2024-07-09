@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 
-from .login import router as login_router
 from .group import router as group_router
 from .teacher import router as teacher_router
 from .department import router as department_router
@@ -10,7 +9,6 @@ from .lesson import router as lesson_router
 
 router = APIRouter()
 
-# router.include_router(login_router)
 router.include_router(group_router, prefix='/group')
 router.include_router(teacher_router, prefix='/teacher', tags=['Teachers'])
 router.include_router(department_router, prefix='/department', tags=['Departments'])

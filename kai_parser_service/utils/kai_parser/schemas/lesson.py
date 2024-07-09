@@ -2,14 +2,20 @@ import datetime
 from functools import cached_property
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, computed_field, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    computed_field,
+    field_validator,
+    model_validator,
+)
 
 from utils.kai_parser.schemas.common import LessonType, ParsedDatesStatus, WeekParity
 
 
 class ParsedLesson(BaseModel):
     model_config = ConfigDict(
-        str_strip_whitespace=True
+        str_strip_whitespace=True,
     )
 
     day_number: int
@@ -90,7 +96,10 @@ class ParsedLesson(BaseModel):
     @computed_field
     @cached_property
     def parsed_lesson_type(self) -> LessonType:
-        if 'физическая культура' in self.discipline_name.lower() and self.discipline_type.lower() == 'пр':
+        if (
+            'физическая культура' in self.discipline_name.lower()
+            and self.discipline_type.lower() == 'пр'
+        ):
             return LessonType.physical_education
 
         if 'военная подготовка' == self.discipline_name.lower().strip():
@@ -105,7 +114,10 @@ class ParsedLesson(BaseModel):
             'и.д.': LessonType.individual_task,
         }
 
-        return lesson_type_mapping.get(self.discipline_type.strip().lower(), LessonType.unknown)
+        return lesson_type_mapping.get(
+            self.discipline_type.strip().lower(),
+            LessonType.unknown,
+        )
 
     @computed_field
     @cached_property
@@ -116,7 +128,10 @@ class ParsedLesson(BaseModel):
         try:
             current_year = datetime.date.today().year
             dates = [
-                datetime.datetime.strptime(f'{date_str}.{current_year}', '%d.%m.%Y').date()
+                datetime.datetime.strptime(
+                    f'{date_str}.{current_year}',
+                    '%d.%m.%Y',
+                ).date()
                 for date_str in dates_str_list
             ]
         except ValueError:
@@ -138,9 +153,25 @@ class ParsedLesson(BaseModel):
     @cached_property
     def parsed_dates_status(self) -> ParsedDatesStatus:
         good_parity_variants = (
-            'неч', 'неч.нед', 'неч.нед.', 'нечет.нед.', 'нечетнаянеделя', 'неч.н', 'неч.н.', 'нечет.н', 'нечет.н.',
-            'чет', 'чет.нед', 'чет.нед.', 'четнаянеделя', 'чет.н', 'чет.н.',
-            'неч/чет', 'чет/неч', 'eжн', 'еженедельно'
+            'неч',
+            'неч.нед',
+            'неч.нед.',
+            'нечет.нед.',
+            'нечетнаянеделя',
+            'неч.н',
+            'неч.н.',
+            'нечет.н',
+            'нечет.н.',
+            'чет',
+            'чет.нед',
+            'чет.нед.',
+            'четнаянеделя',
+            'чет.н',
+            'чет.н.',
+            'неч/чет',
+            'чет/неч',
+            'eжн',
+            'еженедельно',
         )
         processed_dates = self.dates.strip().replace('ё', 'е').replace(' ', '').lower()
         if processed_dates in good_parity_variants:
@@ -171,10 +202,13 @@ class ParsedLesson(BaseModel):
             datetime.timedelta(hours=15, minutes=10),
             datetime.timedelta(hours=16, minutes=50),
             datetime.timedelta(hours=18, minutes=25),
-            datetime.timedelta(hours=20, minutes=00)
+            datetime.timedelta(hours=20, minutes=00),
         )
 
-        start_time = datetime.timedelta(hours=self.start_time.hour, minutes=self.start_time.minute)
+        start_time = datetime.timedelta(
+            hours=self.start_time.hour,
+            minutes=self.start_time.minute,
+        )
 
         if start_time not in start_times:
             return None
@@ -187,8 +221,7 @@ class ParsedLesson(BaseModel):
     @staticmethod
     def sanitize_dates(dates: str) -> str:
         return (
-            dates
-            .replace('ё', 'е')
+            dates.replace('ё', 'е')
             .replace('нечет', '')
             .replace('неч', '')
             .replace('чет', '')

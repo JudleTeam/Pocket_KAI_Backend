@@ -2,7 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from api.dependencies import check_service_token, TeacherServiceDep
 from api.schemas.teacher import TeacherCreate, TeacherRead
-from core.exceptions.base import EntityAlreadyExistsError, BadRelatedEntityError, EntityNotFoundError
+from core.exceptions.base import (
+    EntityAlreadyExistsError,
+    BadRelatedEntityError,
+    EntityNotFoundError,
+)
 
 
 router = APIRouter()
@@ -14,7 +18,7 @@ router = APIRouter()
 )
 async def get_teacher_by_login(
     login: str,
-    teacher_service: TeacherServiceDep
+    teacher_service: TeacherServiceDep,
 ):
     try:
         return await teacher_service.get_by_login(login=login)
@@ -25,7 +29,7 @@ async def get_teacher_by_login(
 @router.post(
     '',
     response_model=TeacherRead,
-    dependencies=[Depends(check_service_token)]
+    dependencies=[Depends(check_service_token)],
 )
 async def create_teacher(
     teacher_create: TeacherCreate,
@@ -34,6 +38,12 @@ async def create_teacher(
     try:
         return await teacher_service.create(teacher_create)
     except EntityAlreadyExistsError:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Teacher with provided login already exists')
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail='Teacher with provided login already exists',
+        )
     except BadRelatedEntityError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Bad department ID')
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Bad department ID',
+        )

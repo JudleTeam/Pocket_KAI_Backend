@@ -7,7 +7,7 @@ from utils.kai_parser.schemas.common import LessonType, ParsedDatesStatus, WeekP
 
 class GroupScheduleResponse(BaseModel):
     model_config = ConfigDict(
-        from_attributes=True
+        from_attributes=True,
     )
 
     parsed_at: datetime.datetime
@@ -17,7 +17,7 @@ class GroupScheduleResponse(BaseModel):
 
 class LessonRead(BaseModel):
     model_config = ConfigDict(
-        from_attributes=True
+        from_attributes=True,
     )
 
     day_number: int

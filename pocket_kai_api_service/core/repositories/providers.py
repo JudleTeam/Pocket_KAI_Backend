@@ -9,7 +9,7 @@ from core.repositories.group import SAGroupRepository
 from core.repositories.lesson import SALessonRepository
 from core.repositories.service_token import SAServiceTokenRepository
 from core.repositories.teacher import SATeacherRepository
-from database.base import get_async_session
+from database.db import get_async_session
 
 
 AsyncSessionDep = Annotated[AsyncSession, Depends(get_async_session)]

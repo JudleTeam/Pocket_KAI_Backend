@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from database.base import Base
+from database.models.base import Base
 
 
 if TYPE_CHECKING:

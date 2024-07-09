@@ -10,7 +10,7 @@ router = APIRouter()
 
 @router.get(
     '',
-    response_model=list[GroupRead]
+    response_model=list[GroupRead],
 )
 async def get_groups(kai_parser: KaiParserDep):
     try:

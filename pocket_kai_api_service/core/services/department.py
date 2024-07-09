@@ -11,7 +11,7 @@ class DepartmentServiceBase(Protocol):
     def __init__(
         self,
         department_repository: DepartmentRepositoryBase,
-        uow: UnitOfWorkBase
+        uow: UnitOfWorkBase,
     ):
         self.department_repository = department_repository
         self.uow = uow
@@ -29,7 +29,7 @@ class DepartmentService(DepartmentServiceBase):
     async def create(self, department_create: DepartmentCreate) -> DepartmentEntity:
         department = await self.department_repository.create(
             kai_id=department_create.kai_id,
-            name=department_create.name
+            name=department_create.name,
         )
         await self.uow.commit()
         return department

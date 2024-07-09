@@ -19,8 +19,9 @@ def lesson_key(lesson: ParsedLesson) -> tuple:
         lesson.audience_number,
         lesson.building_number,
         lesson.department_id,
-        lesson.teacher_login or None
+        lesson.teacher_login or None,
     )
+
 
 def pocket_lesson_key(lesson: PocketKaiLesson) -> tuple:
     return (
@@ -37,7 +38,7 @@ def pocket_lesson_key(lesson: PocketKaiLesson) -> tuple:
         lesson.audience_number,
         lesson.building_number,
         lesson.department.kai_id if lesson.department else None,
-        lesson.teacher.login if lesson.teacher else None
+        lesson.teacher.login if lesson.teacher else None,
     )
 
 
@@ -57,32 +58,57 @@ def compare_lessons(parsed: ParsedLesson, pocket: PocketKaiLesson) -> dict[str, 
     if parsed.parsed_parity != pocket.parsed_parity:
         differences['parsed_parity'] = (parsed.parsed_parity, pocket.parsed_parity)
     if parsed.parsed_dates_status != pocket.parsed_dates_status:
-        differences['parsed_dates_status'] = (parsed.parsed_dates_status, pocket.parsed_dates_status)
+        differences['parsed_dates_status'] = (
+            parsed.parsed_dates_status,
+            pocket.parsed_dates_status,
+        )
     if parsed.parsed_lesson_type != pocket.parsed_lesson_type:
-        differences['parsed_lesson_type'] = (parsed.parsed_lesson_type, pocket.parsed_lesson_type)
+        differences['parsed_lesson_type'] = (
+            parsed.parsed_lesson_type,
+            pocket.parsed_lesson_type,
+        )
     if parsed.audience_number != pocket.audience_number:
-        differences['audience_number'] = (parsed.audience_number, pocket.audience_number)
+        differences['audience_number'] = (
+            parsed.audience_number,
+            pocket.audience_number,
+        )
     if parsed.building_number != pocket.building_number:
-        differences['building_number'] = (parsed.building_number, pocket.building_number)
+        differences['building_number'] = (
+            parsed.building_number,
+            pocket.building_number,
+        )
     # if parsed.teacher_name != (pocket.teacher.name if pocket.teacher else None):
     #     differences['teacher_name'] = (parsed.teacher_name, (pocket.teacher.name if pocket.teacher else None))
     if parsed.teacher_login != (pocket.teacher.login if pocket.teacher else None):
-        differences['teacher_login'] = (parsed.teacher_login, (pocket.teacher.name if pocket.teacher else None))
-    if parsed.department_id != (pocket.department.kai_id if pocket.department else None):
-        differences['department_id'] = (parsed.department_id, (pocket.department.kai_id if pocket.department else None))
+        differences['teacher_login'] = (
+            parsed.teacher_login,
+            (pocket.teacher.name if pocket.teacher else None),
+        )
+    if parsed.department_id != (
+        pocket.department.kai_id if pocket.department else None
+    ):
+        differences['department_id'] = (
+            parsed.department_id,
+            (pocket.department.kai_id if pocket.department else None),
+        )
 
     for diff in differences:
         differences[diff] = {
             'before': differences[diff][0],
-            'after': differences[diff][1]
+            'after': differences[diff][1],
         }
 
     return differences
 
 
-def find_changes_in_lessons(parsed_lessons: list[ParsedLesson], pocket_kai_lessons: list[PocketKaiLesson]):
+def find_changes_in_lessons(
+    parsed_lessons: list[ParsedLesson],
+    pocket_kai_lessons: list[PocketKaiLesson],
+):
     parsed_lessons_dict = {lesson_key(lesson): lesson for lesson in parsed_lessons}
-    pocket_lessons_dict = {pocket_lesson_key(lesson): lesson for lesson in pocket_kai_lessons}
+    pocket_lessons_dict = {
+        pocket_lesson_key(lesson): lesson for lesson in pocket_kai_lessons
+    }
 
     unchanged_lessons = list()
     changed_lessons = list()
@@ -95,16 +121,23 @@ def find_changes_in_lessons(parsed_lessons: list[ParsedLesson], pocket_kai_lesso
 
     for parsed_lesson_key, parsed_lesson in parsed_lessons_dict.copy().items():
         possible_pairs = list()
-        for pocket_kai_lesson_key, pocket_kai_lesson in pocket_lessons_dict.copy().items():
+        for (
+            pocket_kai_lesson_key,
+            pocket_kai_lesson,
+        ) in pocket_lessons_dict.copy().items():
             if (
                 parsed_lesson.discipline_number == pocket_kai_lesson.discipline.kai_id
-                and parsed_lesson.discipline_type == pocket_kai_lesson.original_lesson_type
+                and parsed_lesson.discipline_type
+                == pocket_kai_lesson.original_lesson_type
             ):
                 possible_pairs.append((pocket_kai_lesson_key, pocket_kai_lesson))
 
         if len(possible_pairs) >= 1:
             # Подбирает новому уроку пару с наименьшей разницей
-            differences = [compare_lessons(parsed_lesson, possible_pair[1]) for possible_pair in possible_pairs]
+            differences = [
+                compare_lessons(parsed_lesson, possible_pair[1])
+                for possible_pair in possible_pairs
+            ]
             min_diff = min(differences, key=len)
             min_diff_possible_pair = possible_pairs[differences.index(min_diff)]
 
@@ -112,8 +145,8 @@ def find_changes_in_lessons(parsed_lessons: list[ParsedLesson], pocket_kai_lesso
                 {
                     'old': min_diff_possible_pair[1],
                     'new': parsed_lesson,
-                    'differences': min_diff
-                }
+                    'differences': min_diff,
+                },
             )
 
             pocket_lessons_dict.pop(min_diff_possible_pair[0])

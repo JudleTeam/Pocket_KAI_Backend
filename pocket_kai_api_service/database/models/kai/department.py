@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column
 
-from database.base import Base
+from database.models.base import Base
 
 
 class Department(Base):
@@ -19,14 +19,22 @@ class Department(Base):
                 continue
 
             if part.lower() == 'и':
-                if not (len(name_parts) - 1 > ind > 0 and name_parts[ind + 1].lower()[0] != 'и' and name_parts[ind - 1].lower()[0] != 'и'):
+                if not (
+                    len(name_parts) - 1 > ind > 0
+                    and name_parts[ind + 1].lower()[0] != 'и'
+                    and name_parts[ind - 1].lower()[0] != 'и'
+                ):
                     continue
 
                 short_name += 'и'
                 continue
 
             if part.lower() == 'как':
-                if not (len(name_parts) - 1 > ind > 0 and name_parts[ind + 1].lower()[0] != 'к' and name_parts[ind - 1].lower()[0] != 'к'):
+                if not (
+                    len(name_parts) - 1 > ind > 0
+                    and name_parts[ind + 1].lower()[0] != 'к'
+                    and name_parts[ind - 1].lower()[0] != 'к'
+                ):
                     continue
 
                 short_name += 'к'

@@ -7,8 +7,12 @@ from core.repositories.discipline import DisciplineRepositoryBase
 from core.repositories.group import GroupRepositoryBase
 from core.repositories.lesson import LessonRepositoryBase
 from core.repositories.providers import (
-    get_discipline_repository, get_group_repository, get_lesson_repository, get_service_token_repository,
-    get_teacher_repository, get_department_repository,
+    get_discipline_repository,
+    get_group_repository,
+    get_lesson_repository,
+    get_service_token_repository,
+    get_teacher_repository,
+    get_department_repository,
 )
 from core.repositories.service_token import ServiceTokenRepositoryBase
 from core.repositories.teacher import TeacherRepositoryBase
@@ -26,21 +30,21 @@ UOWDep = Annotated[UnitOfWorkBase, Depends(get_uow)]
 
 def get_group_service(
     group_repository: Annotated[GroupRepositoryBase, Depends(get_group_repository)],
-    unit_of_work: UOWDep
+    unit_of_work: UOWDep,
 ) -> GroupServiceBase:
     return GroupService(
         group_repository=group_repository,
-        uow=unit_of_work
+        uow=unit_of_work,
     )
 
 
 def get_lesson_service(
     lesson_repository: Annotated[LessonRepositoryBase, Depends(get_lesson_repository)],
-    unit_of_work: UOWDep
+    unit_of_work: UOWDep,
 ) -> LessonServiceBase:
     return LessonService(
         lesson_repository=lesson_repository,
-        uow=unit_of_work
+        uow=unit_of_work,
     )
 
 
@@ -48,42 +52,57 @@ def get_schedule_service(
     lesson_repository: Annotated[LessonRepositoryBase, Depends(get_lesson_repository)],
     group_repository: Annotated[GroupRepositoryBase, Depends(get_group_repository)],
 ) -> ScheduleServiceBase:
-    return ScheduleService(lesson_repository=lesson_repository, group_repository=group_repository)
+    return ScheduleService(
+        lesson_repository=lesson_repository,
+        group_repository=group_repository,
+    )
 
 
 def get_service_token_service(
-    service_token_repository: Annotated[ServiceTokenRepositoryBase, Depends(get_service_token_repository)],
+    service_token_repository: Annotated[
+        ServiceTokenRepositoryBase,
+        Depends(get_service_token_repository),
+    ],
 ) -> ServiceTokenServiceBase:
     return ServiceTokenService(
-        service_token_repository=service_token_repository
+        service_token_repository=service_token_repository,
     )
 
 
 def get_teacher_service(
-    teacher_repository: Annotated[TeacherRepositoryBase, Depends(get_teacher_repository)],
-    unit_of_work: UOWDep
+    teacher_repository: Annotated[
+        TeacherRepositoryBase,
+        Depends(get_teacher_repository),
+    ],
+    unit_of_work: UOWDep,
 ) -> TeacherServiceBase:
     return TeacherService(
         teacher_repository=teacher_repository,
-        uow=unit_of_work
+        uow=unit_of_work,
     )
 
 
 def get_department_service(
-    department_repository: Annotated[DepartmentRepositoryBase, Depends(get_department_repository)],
-    unit_of_work: UOWDep
+    department_repository: Annotated[
+        DepartmentRepositoryBase,
+        Depends(get_department_repository),
+    ],
+    unit_of_work: UOWDep,
 ) -> DepartmentServiceBase:
     return DepartmentService(
         department_repository=department_repository,
-        uow=unit_of_work
+        uow=unit_of_work,
     )
 
 
 def get_discipline_service(
-    discipline_repository: Annotated[DisciplineRepositoryBase, Depends(get_discipline_repository)],
-    unit_of_work: UOWDep
+    discipline_repository: Annotated[
+        DisciplineRepositoryBase,
+        Depends(get_discipline_repository),
+    ],
+    unit_of_work: UOWDep,
 ) -> DisciplineServiceBase:
     return DisciplineService(
         discipline_repository=discipline_repository,
-        uow=unit_of_work
+        uow=unit_of_work,
     )

@@ -12,7 +12,10 @@ from core.entities.teacher import TeacherEntity
 
 
 class LessonEntity(BaseEntity):
-    number_of_day: Annotated[int, Field(ge=1, le=7, description='Monday - 1, ..., Sunday - 7')]
+    number_of_day: Annotated[
+        int,
+        Field(ge=1, le=7, description='Monday - 1, ..., Sunday - 7'),
+    ]
     original_dates: str | None
     parsed_parity: WeekParity
     parsed_dates: list[dt.date] | None

@@ -30,19 +30,27 @@ class LessonRepositoryBase(GenericRepository[LessonEntity], ABC):
         discipline_id: UUID,
         teacher_id: UUID,
         department_id: UUID,
-        group_id: UUID
+        group_id: UUID,
     ) -> LessonEntity:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_by_group_id(self, group_id: UUID, week_parity: WeekParity = WeekParity.any) -> list[LessonEntity]:
+    async def get_by_group_id(
+        self,
+        group_id: UUID,
+        week_parity: WeekParity = WeekParity.any,
+    ) -> list[LessonEntity]:
         raise NotImplementedError
 
 
 class SALessonRepository(GenericSARepository[LessonEntity], LessonRepositoryBase):
     model_cls = GroupLesson
 
-    async def get_by_group_id(self, group_id: UUID, week_parity: WeekParity = WeekParity.any) -> list[LessonEntity]:
+    async def get_by_group_id(
+        self,
+        group_id: UUID,
+        week_parity: WeekParity = WeekParity.any,
+    ) -> list[LessonEntity]:
         if week_parity == WeekParity.any:
             parities = {WeekParity.any, WeekParity.odd, WeekParity.even}
         else:
@@ -52,7 +60,7 @@ class SALessonRepository(GenericSARepository[LessonEntity], LessonRepositoryBase
             select(GroupLesson)
             .where(
                 GroupLesson.group_id == group_id,
-                GroupLesson.parsed_parity.in_(parities)
+                GroupLesson.parsed_parity.in_(parities),
             )
             .order_by(GroupLesson.number_of_day, GroupLesson.start_time)
         )
@@ -75,7 +83,7 @@ class SALessonRepository(GenericSARepository[LessonEntity], LessonRepositoryBase
         discipline_id: UUID,
         teacher_id: UUID,
         department_id: UUID | None,
-        group_id: UUID
+        group_id: UUID,
     ) -> LessonEntity:
         new_lesson = GroupLesson(
             number_of_day=number_of_day,
@@ -92,7 +100,7 @@ class SALessonRepository(GenericSARepository[LessonEntity], LessonRepositoryBase
             discipline_id=discipline_id,
             teacher_id=teacher_id,
             department_id=department_id,
-            group_id=group_id
+            group_id=group_id,
         )
         await self._add(new_lesson)
         await self._session.refresh(new_lesson, ['department', 'teacher', 'discipline'])

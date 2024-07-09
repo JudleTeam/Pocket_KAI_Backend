@@ -12,7 +12,7 @@ from core.exceptions.base import (
     EntityNotFoundError,
     EntityAlreadyExistsError,
 )
-from database.base import Base
+from database.models.base import Base
 
 
 class GenericRepository[T: BaseEntity](ABC):
@@ -141,7 +141,11 @@ class GenericSARepository[T: BaseEntity](GenericRepository[T], ABC):
         return await self._convert_db_to_entity(result, **kwargs)
 
     async def list(
-        self, offset=0, limit=100, filters: dict = None, **kwargs
+        self,
+        offset=0,
+        limit=100,
+        filters: dict = None,
+        **kwargs,
     ) -> list[T]:
         if filters is None:
             filters = {}

@@ -21,8 +21,11 @@ class WeekParity(str, Enum):
     any = 'any'
 
     @classmethod
-    def get_parity_for_date(cls, date: dt.date) -> Union['WeekParity.even', 'WeekParity.odd']:
-        if int(date.strftime("%V")) % 2 == 1:
+    def get_parity_for_date(
+        cls,
+        date: dt.date,
+    ) -> Union['WeekParity.even', 'WeekParity.odd']:
+        if int(date.strftime('%V')) % 2 == 1:
             return cls.odd
         return cls.even
 

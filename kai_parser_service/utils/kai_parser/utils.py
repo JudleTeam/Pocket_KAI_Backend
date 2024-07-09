@@ -32,4 +32,7 @@ def parse_phone_number(phone_number) -> str | None:
     if not phonenumbers.is_valid_number(parsed_number):
         return None
 
-    return phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.E164)
+    return phonenumbers.format_number(
+        parsed_number,
+        phonenumbers.PhoneNumberFormat.E164,
+    )

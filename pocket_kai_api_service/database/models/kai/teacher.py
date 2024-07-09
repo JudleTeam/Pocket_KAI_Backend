@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy import ForeignKey, text, select, func, or_
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
-from database.base import Base
+from database.models.base import Base
 
 if TYPE_CHECKING:
     from database.models.kai import Department
@@ -25,9 +25,15 @@ class Teacher(Base):
         await session.execute(text('CREATE EXTENSION IF NOT EXISTS pg_trgm'))
         name = name.lower()
         records = await session.execute(
-            select(Teacher).where(
-                or_(func.similarity(Teacher.name, name) > similarity, Teacher.name.ilike(f'%{name}%'))
-            ).limit(limit).offset(offset)
+            select(Teacher)
+            .where(
+                or_(
+                    func.similarity(Teacher.name, name) > similarity,
+                    Teacher.name.ilike(f'%{name}%'),
+                ),
+            )
+            .limit(limit)
+            .offset(offset),
         )
         return records.scalars().all()
 

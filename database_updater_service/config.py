@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         frozen=True,
         env_file='.env',
-        env_file_encoding='UTF-8'
+        env_file_encoding='UTF-8',
     )
 
     pocket_kai_api_url: str

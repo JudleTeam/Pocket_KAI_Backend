@@ -3,25 +3,28 @@ from typing import Self
 from uuid import UUID
 
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncAttrs, AsyncSession
+from sqlalchemy.ext.asyncio import (
+    AsyncAttrs,
+    AsyncSession,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 import sqlalchemy as sa
 
-from config import get_settings
-
-
-settings = get_settings()
-engine = create_async_engine(settings.database_url)
-AsyncSessionmaker = async_sessionmaker(engine, expire_on_commit=False)
-
 
 class Base(AsyncAttrs, DeclarativeBase):
-    id: Mapped[UUID] = mapped_column(primary_key=True, server_default=text('gen_random_uuid()'))
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True,
+        server_default=text('gen_random_uuid()'),
+    )
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
     @classmethod
     async def get_or_create(
-            cls, session: AsyncSession, defaults=None, commit=True, **kwargs
+        cls,
+        session: AsyncSession,
+        defaults=None,
+        commit=True,
+        **kwargs,
     ) -> tuple[Self, bool]:
         """Django-inspired get_or_create."""
         predicates = [getattr(cls, k) == v for k, v in kwargs.items()]
@@ -37,8 +40,3 @@ class Base(AsyncAttrs, DeclarativeBase):
             await session.commit()
 
         return instance, True
-
-
-async def get_async_session():
-    async with AsyncSessionmaker() as session:
-        yield session

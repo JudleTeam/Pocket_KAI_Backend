@@ -10,11 +10,11 @@ router = APIRouter()
 
 @router.get(
     '',
-    response_model=GroupScheduleResponse
+    response_model=GroupScheduleResponse,
 )
 async def get_schedule(
     group_kai_id: str,
-    kai_parser: KaiParserDep
+    kai_parser: KaiParserDep,
 ):
     try:
         return await kai_parser.parse_group_schedule(group_kai_id=group_kai_id)

@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column
 
-from database.base import Base
+from database.models.base import Base
 
 
 class Discipline(Base):

@@ -15,14 +15,19 @@ class CoreError(Exception):
 
 class EntityNotFoundError(CoreError):
     def __init__(
-        self, entity: Type[BaseEntity], find_query, message: str | None = None
+        self,
+        entity: Type[BaseEntity],
+        find_query,
+        message: str | None = None,
     ):
         self.entity = entity
         self.find_query = find_query
         super().__init__(message)
 
     def __str__(self) -> str:
-        return f'{self.entity.__name__.replace('Entity', '')}<{self.find_query}> not found'
+        return (
+            f'{self.entity.__name__.replace('Entity', '')}<{self.find_query}> not found'
+        )
 
 
 class BadRelatedEntityError(CoreError):

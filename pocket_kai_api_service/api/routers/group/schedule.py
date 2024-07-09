@@ -19,22 +19,25 @@ router = APIRouter()
     responses={
         404: {
             'description': 'Group not found',
-            'model'      : ErrorMessage
-        }
-    }
+            'model': ErrorMessage,
+        },
+    },
 )
 async def get_week_schedule_by_group_name(
     group_name: str,
     week_parity: Annotated[WeekParity, Query()] = WeekParity.any,
     *,
-    schedule_service: ScheduleServiceDep
+    schedule_service: ScheduleServiceDep,
 ):
     """
     Возвращает расписание по дням недели без конкретных дат для группы по её имени (номеру).
     Можно передать чётность недели. Пары, у которых чётность определилась как чёт/неч, возвращаются *всегда*
     """
     try:
-        return await schedule_service.get_week_schedule_by_group_name(group_name, week_parity=week_parity)
+        return await schedule_service.get_week_schedule_by_group_name(
+            group_name,
+            week_parity=week_parity,
+        )
     except EntityNotFoundError as error:
         raise HTTPException(status_code=404, detail=str(error))
 
@@ -45,22 +48,25 @@ async def get_week_schedule_by_group_name(
     responses={
         404: {
             'description': 'Group not found',
-            'model'      : ErrorMessage
-        }
-    }
+            'model': ErrorMessage,
+        },
+    },
 )
 async def get_week_schedule_by_group_id(
     group_id: UUID,
     week_parity: Annotated[WeekParity, Query()] = WeekParity.any,
     *,
-    schedule_service: ScheduleServiceDep
+    schedule_service: ScheduleServiceDep,
 ):
     """
     Возвращает расписание по дням недели без конкретных дат для группы по её имени (номеру).
     Можно передать чётность недели. Пары, у которых чётность определилась как чёт/неч, возвращаются *всегда*
     """
     try:
-        return await schedule_service.get_week_schedule_by_group_id(group_id, week_parity=week_parity)
+        return await schedule_service.get_week_schedule_by_group_id(
+            group_id,
+            week_parity=week_parity,
+        )
     except EntityNotFoundError as error:
         raise HTTPException(status_code=404, detail=str(error))
 
@@ -71,16 +77,19 @@ async def get_week_schedule_by_group_id(
     responses={
         404: {
             'description': 'Group not found',
-            'model'      : ErrorMessage
-        }
-    }
+            'model': ErrorMessage,
+        },
+    },
 )
 async def get_schedule_with_dates_by_group_id(
-    date_from: Annotated[date, Query(default_factory=date.today, description='By default is today')],
+    date_from: Annotated[
+        date,
+        Query(default_factory=date.today, description='By default is today'),
+    ],
     group_id: UUID,
     days_count: Annotated[int, Query(ge=1, le=31)] = 7,
     *,
-    schedule_service: ScheduleServiceDep
+    schedule_service: ScheduleServiceDep,
 ):
     """
     Возвращает список дней с парами для группы по её ID (ID из PocketKAI).
@@ -90,7 +99,9 @@ async def get_schedule_with_dates_by_group_id(
     """
     try:
         return await schedule_service.get_schedule_with_dates_by_group_id(
-            group_id=group_id, date_from=date_from, days_count=days_count
+            group_id=group_id,
+            date_from=date_from,
+            days_count=days_count,
         )
     except EntityNotFoundError as error:
         raise HTTPException(status_code=404, detail=str(error))
@@ -102,16 +113,19 @@ async def get_schedule_with_dates_by_group_id(
     responses={
         404: {
             'description': 'Group not found',
-            'model'      : ErrorMessage
-        }
-    }
+            'model': ErrorMessage,
+        },
+    },
 )
 async def get_schedule_with_dates_by_group_name(
-    date_from: Annotated[date, Query(default_factory=date.today, description='By default is today')],
+    date_from: Annotated[
+        date,
+        Query(default_factory=date.today, description='By default is today'),
+    ],
     group_name: str,
     days_count: Annotated[int, Query(ge=1, le=31)] = 7,
     *,
-    schedule_service: ScheduleServiceDep
+    schedule_service: ScheduleServiceDep,
 ):
     """
     Возвращает список дней с парами для группы по её имени (номеру).
@@ -121,7 +135,9 @@ async def get_schedule_with_dates_by_group_name(
     """
     try:
         return await schedule_service.get_schedule_with_dates_by_group_name(
-            group_name=group_name, date_from=date_from, days_count=days_count
+            group_name=group_name,
+            date_from=date_from,
+            days_count=days_count,
         )
     except EntityNotFoundError as error:
         raise HTTPException(status_code=404, detail=str(error))

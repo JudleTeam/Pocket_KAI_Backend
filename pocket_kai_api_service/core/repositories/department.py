@@ -19,12 +19,15 @@ class DepartmentRepositoryBase(GenericRepository[DepartmentEntity], ABC):
     async def create(
         self,
         kai_id: int,
-        name: str
+        name: str,
     ) -> DepartmentEntity:
         raise NotImplementedError
 
 
-class SADepartmentRepository(GenericSARepository[DepartmentEntity], DepartmentRepositoryBase):
+class SADepartmentRepository(
+    GenericSARepository[DepartmentEntity],
+    DepartmentRepositoryBase,
+):
     model_cls = Department
 
     async def get_by_kai_id(self, kai_id: int) -> DepartmentEntity:
@@ -37,7 +40,7 @@ class SADepartmentRepository(GenericSARepository[DepartmentEntity], DepartmentRe
     async def create(
         self,
         kai_id: int,
-        name: str
+        name: str,
     ) -> DepartmentEntity:
         new_department = Department(kai_id=kai_id, name=name)
         await self._add(new_department)

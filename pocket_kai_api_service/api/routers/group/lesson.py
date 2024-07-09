@@ -12,11 +12,11 @@ router = APIRouter()
 
 @router.get(
     '/by_id/{group_id}/lesson',
-    response_model=list[LessonRead]
+    response_model=list[LessonRead],
 )
 async def get_group_lessons_by_group_id(
     group_id: UUID,
-    lesson_service: LessonServiceDep
+    lesson_service: LessonServiceDep,
 ):
     try:
         return await lesson_service.get_by_group_id(group_id)

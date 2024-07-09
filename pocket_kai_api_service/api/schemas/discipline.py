@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict
 
 class DisciplineRead(BaseModel):
     model_config = ConfigDict(
-        from_attributes=True
+        from_attributes=True,
     )
 
     id: UUID

@@ -16,12 +16,12 @@ async def update_schedule():
         logging.info('Creating schedule updater...')
         kai_parser_api = KaiParserApi(
             session=session_1,
-            base_kai_parser_url=settings.kai_parser_url
+            base_kai_parser_url=settings.kai_parser_url,
         )
         pocket_kai_api = PocketKaiApi(
             session=session_2,
             base_pocket_kai_url=settings.pocket_kai_api_url,
-            service_token=settings.service_token
+            service_token=settings.service_token,
         )
 
         schedule_updater = ScheduleUpdater(kai_parser_api, pocket_kai_api)

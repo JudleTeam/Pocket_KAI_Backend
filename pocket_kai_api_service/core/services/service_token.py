@@ -8,7 +8,7 @@ from core.repositories.service_token import ServiceTokenRepositoryBase
 class ServiceTokenServiceBase(Protocol):
     def __init__(
         self,
-        service_token_repository: ServiceTokenRepositoryBase
+        service_token_repository: ServiceTokenRepositoryBase,
     ):
         self.service_token_repository = service_token_repository
 
@@ -20,4 +20,3 @@ class ServiceTokenServiceBase(Protocol):
 class ServiceTokenService(ServiceTokenServiceBase):
     async def get_by_token(self, token: str) -> ServiceTokenEntity:
         return await self.service_token_repository.get_by_token(token)
-

@@ -16,7 +16,10 @@ class ServiceTokenRepositoryBase(GenericRepository[ServiceTokenEntity], ABC):
         raise NotImplementedError
 
 
-class SAServiceTokenRepository(GenericSARepository[ServiceTokenEntity], ServiceTokenRepositoryBase):
+class SAServiceTokenRepository(
+    GenericSARepository[ServiceTokenEntity],
+    ServiceTokenRepositoryBase,
+):
     model_cls = ServiceToken
 
     async def get_by_token(self, token: str) -> ServiceTokenEntity:

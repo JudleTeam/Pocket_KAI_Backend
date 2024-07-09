@@ -11,7 +11,7 @@ class GroupServiceBase(ABC):
     def __init__(
         self,
         group_repository: GroupRepositoryBase,
-        uow: UnitOfWorkBase
+        uow: UnitOfWorkBase,
     ):
         self.group_repository = group_repository
         self.uow = uow
@@ -57,7 +57,7 @@ class GroupService(GroupServiceBase):
     async def create(self, group_create: GroupCreate) -> GroupEntity:
         new_group = await self.group_repository.create(
             group_name=group_create.group_name,
-            kai_id=group_create.kai_id
+            kai_id=group_create.kai_id,
         )
         await self.uow.commit()
         return new_group

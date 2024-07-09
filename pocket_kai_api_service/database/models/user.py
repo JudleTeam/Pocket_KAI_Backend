@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import sqlalchemy as sa
 
-from database.base import Base
+from database.models.base import Base
 
 
 if TYPE_CHECKING:
@@ -15,7 +15,11 @@ if TYPE_CHECKING:
 class PocketKAIUser(Base):
     __tablename__ = 'pocket_kai_user'
 
-    telegram_id: Mapped[int | None] = mapped_column(sa.BigInteger, unique=True, default=None)
+    telegram_id: Mapped[int | None] = mapped_column(
+        sa.BigInteger,
+        unique=True,
+        default=None,
+    )
 
     phone: Mapped[str | None] = mapped_column(default=None)
 
@@ -25,9 +29,9 @@ class PocketKAIUser(Base):
 
     tokens: Mapped['Token'] = relationship(
         back_populates='pocket_kai_user',
-        foreign_keys='[Token.pocket_kai_user_id]'
+        foreign_keys='[Token.pocket_kai_user_id]',
     )
     kai_user: Mapped['KAIUser'] = relationship(
         back_populates='pocket_kai_user',
-        foreign_keys='[KAIUser.pocket_kai_user_id]'
+        foreign_keys='[KAIUser.pocket_kai_user_id]',
     )

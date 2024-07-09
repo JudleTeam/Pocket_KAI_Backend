@@ -19,12 +19,15 @@ class DisciplineRepositoryBase(GenericRepository[DisciplineEntity], ABC):
     async def create(
         self,
         kai_id: int,
-        name: str
+        name: str,
     ) -> DisciplineEntity:
         raise NotImplementedError
 
 
-class SADisciplineRepository(GenericSARepository[DisciplineEntity], DisciplineRepositoryBase):
+class SADisciplineRepository(
+    GenericSARepository[DisciplineEntity],
+    DisciplineRepositoryBase,
+):
     model_cls = Discipline
 
     async def get_by_kai_id(self, kai_id: int) -> DisciplineEntity:
@@ -37,7 +40,7 @@ class SADisciplineRepository(GenericSARepository[DisciplineEntity], DisciplineRe
     async def create(
         self,
         kai_id: int,
-        name: str
+        name: str,
     ) -> DisciplineEntity:
         new_discipline = Discipline(kai_id=kai_id, name=name)
         await self._add(new_discipline)

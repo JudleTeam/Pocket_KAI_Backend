@@ -6,7 +6,11 @@ from uuid import UUID
 from utils.common import ParsedDatesStatus
 from utils.kai_parser_api.schemas import WeekParity
 from utils.pocket_kai_api.schemas import (
-    PocketKaiDepartment, PocketKaiDiscipline, PocketKaiGroup, PocketKaiLesson, PocketKaiTeacher
+    PocketKaiDepartment,
+    PocketKaiDiscipline,
+    PocketKaiGroup,
+    PocketKaiLesson,
+    PocketKaiTeacher,
 )
 
 
@@ -44,7 +48,10 @@ class PocketKaiApiBase(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_group_lessons_by_group_id(self, group_id: UUID) -> list[PocketKaiLesson]:
+    async def get_group_lessons_by_group_id(
+        self,
+        group_id: UUID,
+    ) -> list[PocketKaiLesson]:
         raise NotImplementedError
 
     @abstractmethod
@@ -68,19 +75,37 @@ class PocketKaiApiBase(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    async def add_teacher(self, login: str, name: str, department_id: UUID) -> PocketKaiTeacher:
+    async def add_teacher(
+        self,
+        login: str,
+        name: str,
+        department_id: UUID,
+    ) -> PocketKaiTeacher:
         raise NotImplementedError
 
     @abstractmethod
-    async def create_or_get_discipline_by_kai_id(self, name: str, kai_id: int) -> PocketKaiDiscipline:
+    async def create_or_get_discipline_by_kai_id(
+        self,
+        name: str,
+        kai_id: int,
+    ) -> PocketKaiDiscipline:
         raise NotImplementedError
 
     @abstractmethod
-    async def create_or_get_department_by_kai_id(self, name: str, kai_id: int) -> PocketKaiDepartment:
+    async def create_or_get_department_by_kai_id(
+        self,
+        name: str,
+        kai_id: int,
+    ) -> PocketKaiDepartment:
         raise NotImplementedError
 
     @abstractmethod
-    async def create_or_get_teacher_by_login(self, login: str, name: str, department_id: UUID) -> PocketKaiTeacher:
+    async def create_or_get_teacher_by_login(
+        self,
+        login: str,
+        name: str,
+        department_id: UUID,
+    ) -> PocketKaiTeacher:
         raise NotImplementedError
 
     @abstractmethod
@@ -100,7 +125,7 @@ class PocketKaiApiBase(Protocol):
         discipline_id: UUID,
         teacher_id: UUID | None,
         department_id: UUID,
-        group_id: UUID
+        group_id: UUID,
     ) -> PocketKaiLesson:
         raise NotImplementedError
 
@@ -122,7 +147,7 @@ class PocketKaiApiBase(Protocol):
         discipline_id: UUID,
         teacher_id: UUID | None,
         department_id: UUID,
-        group_id: UUID
+        group_id: UUID,
     ) -> PocketKaiLesson:
         raise NotImplementedError
 

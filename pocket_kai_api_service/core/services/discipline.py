@@ -11,7 +11,7 @@ class DisciplineServiceBase(Protocol):
     def __init__(
         self,
         discipline_repository: DisciplineRepositoryBase,
-        uow: UnitOfWorkBase
+        uow: UnitOfWorkBase,
     ):
         self.discipline_repository = discipline_repository
         self.uow = uow
@@ -29,7 +29,7 @@ class DisciplineService(DisciplineServiceBase):
     async def create(self, discipline_create: DisciplineCreate) -> DisciplineEntity:
         discipline = await self.discipline_repository.create(
             kai_id=discipline_create.kai_id,
-            name=discipline_create.name
+            name=discipline_create.name,
         )
         await self.uow.commit()
         return discipline

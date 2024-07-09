@@ -9,7 +9,7 @@ from utils.kai_parser.parser import KaiParser
 
 
 async def get_kai_parser(
-    settings: Annotated[Settings, Depends(get_settings)]
+    settings: Annotated[Settings, Depends(get_settings)],
 ) -> KaiParserBase:
     async with ClientSession() as session:
         yield KaiParser(
