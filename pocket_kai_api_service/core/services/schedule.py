@@ -2,7 +2,7 @@ import datetime as dt
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from api.schemas.schedule import DayResponse, ScheduleResponse, WeekDaysResponse
+from api.schemas.schedule import DayResponse, ScheduleLesson, ScheduleResponse, WeekDaysResponse
 from core.entities.group import GroupEntity
 from core.entities.lesson import LessonEntity
 from core.entities.common import WeekParity
@@ -70,6 +70,28 @@ class ScheduleService(ScheduleServiceBase):
 
         return filtered_lessons
 
+    async def _convert_lesson_entity_to_schedule_lesson(
+        self,
+        lesson: LessonEntity,
+        date: dt.date | None
+    ) -> ScheduleLesson:
+        groups_on_stream = await self.group_repository.get_by_lesson_data(
+            date=date,
+            discipline_id=lesson.discipline_id,
+            number_of_day=lesson.number_of_day,
+            parsed_parity=lesson.parsed_parity,
+            original_lesson_type=lesson.original_lesson_type,
+            building_number=lesson.building_number,
+            audience_number=lesson.audience_number,
+            start_time=lesson.start_time,
+        )
+
+        groups_names = [group.group_name for group in groups_on_stream]
+        return ScheduleLesson(
+            **lesson.model_dump(),
+            groups_on_stream=groups_names,
+        )
+
     async def _get_schedule_with_week_days_by_group(self, group: GroupEntity, week_parity: WeekParity) -> WeekDaysResponse:
         group_lessons = await self.lesson_repository.get_by_group_id(group.id, week_parity=week_parity)
 
@@ -96,7 +118,9 @@ class ScheduleService(ScheduleServiceBase):
         for lesson in group_lessons:
             day = day_mapping.get(lesson.number_of_day)
             if day:
-                lessons_by_week_days[day].append(lesson)
+                lessons_by_week_days[day].append(
+                    await self._convert_lesson_entity_to_schedule_lesson(lesson, date=None)
+                )
 
         return WeekDaysResponse(
             parsed_at=group.schedule_parsed_at,
@@ -127,7 +151,10 @@ class ScheduleService(ScheduleServiceBase):
             schedule_day = DayResponse(
                 date=date,
                 parity=parity,
-                lessons=self._filter_lessons_by_date(group_lessons, date),
+                lessons=[
+                    await self._convert_lesson_entity_to_schedule_lesson(lesson, date)
+                    for lesson in self._filter_lessons_by_date(group_lessons, date)
+                ],
             )
             schedule_days.append(schedule_day)
 

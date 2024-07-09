@@ -6,6 +6,10 @@ from api.schemas.lesson import LessonRead
 from core.entities.common import WeekParity
 
 
+class ScheduleLesson(LessonRead):
+    groups_on_stream: list[str]
+
+
 class ScheduleResponse(BaseModel):
     parsed_at: dt.datetime | None
     days: list['DayResponse']
@@ -14,24 +18,24 @@ class ScheduleResponse(BaseModel):
 class DayResponse(BaseModel):
     date: dt.date
     parity: WeekParity = WeekParity.any
-    lessons: list[LessonRead]
+    lessons: list[ScheduleLesson]
 
 
-class Week(BaseModel):
+class WeekResponse(BaseModel):
     model_config = ConfigDict(
         from_attributes=True
     )
 
-    monday: list[LessonRead]
-    tuesday: list[LessonRead]
-    wednesday: list[LessonRead]
-    thursday: list[LessonRead]
-    friday: list[LessonRead]
-    saturday: list[LessonRead]
-    sunday: list[LessonRead]
+    monday: list[ScheduleLesson]
+    tuesday: list[ScheduleLesson]
+    wednesday: list[ScheduleLesson]
+    thursday: list[ScheduleLesson]
+    friday: list[ScheduleLesson]
+    saturday: list[ScheduleLesson]
+    sunday: list[ScheduleLesson]
 
 
 class WeekDaysResponse(BaseModel):
     parsed_at: dt.datetime | None
     week_parity: WeekParity
-    week_days: Week
+    week_days: WeekResponse
