@@ -2,7 +2,10 @@
 .git
 .gitignore
 .gitattributes
+.pre-commit-config.yaml
 
+README.md
+ruff.toml
 
 # CI
 .codeclimate.yml
@@ -11,6 +14,7 @@
 
 # Docker
 docker-compose.yml
+docker-compose.dev.yml
 Dockerfile
 .docker
 .dockerignore
