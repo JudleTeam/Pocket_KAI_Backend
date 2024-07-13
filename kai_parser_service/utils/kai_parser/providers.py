@@ -6,6 +6,7 @@ from fastapi import Depends
 from config import Settings, get_settings
 from utils.kai_parser.base import KaiParserBase
 from utils.kai_parser.parser import KaiParser
+from utils.kai_parser.user_parser import KaiUserParser
 
 
 async def get_kai_parser(
@@ -16,4 +17,14 @@ async def get_kai_parser(
             session=session,
             timeout=settings.timeout_seconds,
             request_retries=settings.request_retries,
+        )
+
+
+async def get_kai_user_parser(
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> KaiUserParser:
+    async with ClientSession() as session:
+        yield KaiUserParser(
+            session=session,
+            max_retries=settings.request_retries,
         )

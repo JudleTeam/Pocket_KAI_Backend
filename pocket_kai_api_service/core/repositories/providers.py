@@ -6,7 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.repositories.department import SADepartmentRepository
 from core.repositories.discipline import SADisciplineRepository
 from core.repositories.group import SAGroupRepository
+from core.repositories.kai_user import SAKaiUserRepository
 from core.repositories.lesson import SALessonRepository
+from core.repositories.pocket_kai_user import SAPocketKaiUserRepository
+from core.repositories.refresh_token import SARefreshTokenRepository
 from core.repositories.service_token import SAServiceTokenRepository
 from core.repositories.teacher import SATeacherRepository
 from database.db import get_async_session
@@ -37,3 +40,15 @@ def get_department_repository(session: AsyncSessionDep):
 
 def get_discipline_repository(session: AsyncSessionDep):
     return SADisciplineRepository(session=session)
+
+
+def get_pocket_kai_user_repository(session: AsyncSessionDep):
+    return SAPocketKaiUserRepository(session=session)
+
+
+def get_kai_user_repository(session: AsyncSessionDep):
+    return SAKaiUserRepository(session=session)
+
+
+def get_refresh_token_repository(session: AsyncSessionDep):
+    return SARefreshTokenRepository(session=session)

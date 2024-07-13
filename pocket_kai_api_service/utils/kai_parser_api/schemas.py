@@ -47,6 +47,3 @@ class UserAbout(BaseModel):
     dateDog: str | None
     kafId: int
     rabTheme: str | None
-
-    class Config:
-        str_strip_whitespace = True

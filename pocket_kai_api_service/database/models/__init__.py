@@ -2,11 +2,11 @@ from . import kai
 
 from .user import PocketKAIUser
 from .service_token import ServiceToken
-from .token import Token
+from .refresh_token import RefreshToken
 
 __all__ = [
     'kai',
     'PocketKAIUser',
     'ServiceToken',
-    'Token',
+    'RefreshToken',
 ]

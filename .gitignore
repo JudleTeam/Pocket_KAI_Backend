@@ -9,6 +9,8 @@ __pycache__/
 
 test.py
 
+*.pem
+
 # Distribution / packaging
 .Python
 build/

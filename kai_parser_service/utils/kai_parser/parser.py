@@ -1,9 +1,9 @@
 import asyncio
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
-from typing import Literal
+from typing import AsyncIterator
 
-from aiohttp import ClientError, ClientSession
+from aiohttp import ClientError, ClientResponse, ClientSession
 
 from utils.kai_parser.base import KaiParserBase
 from utils.kai_parser.schemas.errors import KaiApiError
@@ -30,52 +30,49 @@ class KaiParser(KaiParserBase):
         self.timeout = timeout
 
     @asynccontextmanager
-    async def _send_request(
-        self,
-        method: Literal['GET', 'POST'],
-        url: str,
-        params: dict = None,
-        data=None,
-        json=None,
-    ):
-        async with self.session.request(
-            method,
-            url,
-            timeout=self.timeout,
-            params=params,
-            data=data,
-            json=json,
-        ) as response:
-            if not response.ok:
-                raise KaiApiError
-            yield response
-
-    @asynccontextmanager
     async def _request(
         self,
-        method: Literal['GET', 'POST'],
-        url: str,
-        params: dict = None,
-        data=None,
-        json=None,
+        method,
+        url,
+        *,
         current_retry=0,
-    ):
+        **kwargs,
+    ) -> AsyncIterator[ClientResponse]:
         try:
-            async with self._send_request(method, url, params, data, json) as response:
+            async with self.session.request(
+                method=method,
+                url=url,
+                **kwargs,
+                timeout=self.timeout,
+            ) as response:
+                if not response.ok:
+                    if current_retry < self.request_retries:
+                        yield await self._request(
+                            method,
+                            url,
+                            current_retry=current_retry + 1,
+                            **kwargs,
+                        )
+                    raise KaiApiError(
+                        f'URL: {url} | Status: {response.status} | Content: {await response.text()}',
+                    )
                 yield response
-        except (asyncio.TimeoutError, ClientError, KaiApiError):
+
+        except (asyncio.TimeoutError, ClientError):
             if current_retry < self.request_retries:
-                async with self._request(
+                yield await self._request(
                     method,
                     url,
-                    params,
-                    data,
-                    json,
-                    current_retry + 1,
-                ) as retry_response:
-                    yield retry_response
-            else:
-                raise KaiApiError
+                    current_retry=current_retry + 1,
+                    **kwargs,
+                )
+            raise KaiApiError(
+                f'URL: {url} | Status: {response.status} | Content: {await response.text()}',
+            )
+
+    async def _awaitable_request(self, **kwargs):
+        async with self._request(**kwargs) as response:
+            return response
 
     async def parse_groups(self) -> list[ParsedGroup]:
         request_params = {

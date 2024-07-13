@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     request_retries: int = 3
     timeout_seconds: int = 30
 
+    pocket_kai_base_url: str
+
 
 @lru_cache
 def get_settings() -> Settings:

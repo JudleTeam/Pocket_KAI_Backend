@@ -2,8 +2,8 @@ from datetime import datetime
 
 from bs4 import BeautifulSoup
 
-from utils.kai_parser.schemas.group import Documents, Group
-from utils.kai_parser.schemas.user import BaseUser, UserInfo
+from utils.kai_parser.schemas.group import Documents
+from utils.kai_parser.schemas.user import GroupMember, UserInfo
 from utils.kai_parser.utils import parse_phone_number
 
 
@@ -52,48 +52,61 @@ def parse_user_info(soup: BeautifulSoup):
     return user_info
 
 
-def parse_group_members(soup: BeautifulSoup) -> Group:
+def parse_group_members(
+    soup: BeautifulSoup,
+    group_name: str | None = None,
+) -> list[GroupMember]:
+    group_table_index = -1
+    if group_name:
+        buttons = soup.find_all('label', class_='radio')
+        for index, button in enumerate(buttons):
+            if group_name in button.text.strip():
+                group_table_index = index
+                break
+
     group_members = list()
-    leader_num = None
-    last_table = soup.find_all('table')[-1]
+    last_table = soup.find_all('table')[group_table_index]
     table_rows = last_table.find_all('tr')
     for num, row in enumerate(table_rows[1:], start=1):
         columns = row.find_all('td')
 
+        is_leader = False
         full_name = columns[1].text.strip()
         if 'Староста' in full_name:
-            leader_num = num
+            is_leader = True
             full_name = full_name.replace('Староста', '').strip()
+
         email = columns[2].text.strip().lower()
         phone = parse_phone_number(columns[3].text.strip())
 
-        user = BaseUser(full_name=full_name, email=email, phone=phone)
+        user = GroupMember(
+            is_leader=is_leader,
+            number=num,
+            full_name=full_name,
+            email=email,
+            phone=phone,
+        )
         group_members.append(user)
 
-    return Group(members=group_members, leader_num=leader_num)
+    return group_members
 
 
 def parse_documents(soup: BeautifulSoup) -> Documents:
     content = soup.find('div', class_='row div_container')
 
-    def check_edu(text):
-        if text is None or text.name != 'a':
-            return False
-        return 'Образовательная программа' in text
+    def check_for_text_in_a(text: str):
+        def check(tag):
+            if tag is None or tag.name != 'a':
+                return False
+            return text in tag
 
-    def check_syllabus(text):
-        if text is None or text.name != 'a':
-            return False
-        return 'Учебный план' in text
+        return check
 
-    def check_schedule(text):
-        if text is None or text.name != 'a':
-            return False
-        return 'Календарный график' in text
-
-    edu_program_raw = content.find(name=check_edu)
-    syllabus_raw = content.find(name='a', string=check_syllabus)
-    study_schedule_raw = content.find(name='a', string=check_schedule)
+    edu_program_raw = content.find(
+        name=check_for_text_in_a('Образовательная программа'),
+    )
+    syllabus_raw = content.find(name=check_for_text_in_a('Учебный план'))
+    study_schedule_raw = content.find(name=check_for_text_in_a('Календарный график'))
 
     return Documents(
         syllabus=syllabus_raw['href'] if syllabus_raw else None,

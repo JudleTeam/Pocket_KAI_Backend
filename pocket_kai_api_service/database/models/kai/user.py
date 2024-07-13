@@ -3,8 +3,6 @@ from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import ForeignKey
-from sqlalchemy.ext.asyncio import async_sessionmaker
-from sqlalchemy.future import select
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy_utils import StringEncryptedType
 import sqlalchemy as sa
@@ -41,7 +39,7 @@ class KAIUser(Base):
 
     zach_number: Mapped[str | None] = mapped_column()  # Уникальный?
     competition_type: Mapped[str | None] = mapped_column()
-    contract_number: Mapped[int | None] = mapped_column(sa.BigInteger)  # Уникальный?
+    contract_number: Mapped[str | None] = mapped_column()  # Уникальный?
     edu_level: Mapped[str | None] = mapped_column()
     edu_cycle: Mapped[str | None] = mapped_column()
     edu_qualification: Mapped[str | None] = mapped_column()
@@ -51,7 +49,7 @@ class KAIUser(Base):
     group_id: Mapped[UUID] = mapped_column(
         ForeignKey('group.id', name='fk_kai_user_group'),
     )
-    pocket_kai_user_id: Mapped[UUID] = mapped_column(
+    pocket_kai_user_id: Mapped[UUID | None] = mapped_column(
         ForeignKey('pocket_kai_user.id'),
         unique=True,
     )
@@ -61,32 +59,3 @@ class KAIUser(Base):
         back_populates='members',
     )
     pocket_kai_user: Mapped['PocketKAIUser'] = relationship(back_populates='kai_user')
-
-    async def get_classmates(self, db: async_sessionmaker):
-        async with db() as session:
-            records = await session.execute(
-                select(KAIUser)
-                .where(KAIUser.group_id == self.group_id)
-                .order_by(KAIUser.position),
-            )
-
-        return records.scalars().all()
-
-    @property
-    def is_logged_in(self) -> bool:
-        return bool(self.kai_id)
-
-    @classmethod
-    async def get_by_phone(cls, phone: str, db: async_sessionmaker):
-        async with db() as session:
-            records = await session.execute(
-                select(KAIUser).where(KAIUser.phone == phone),
-            )
-
-        return records.scalars().all()
-
-    @classmethod
-    async def get_by_email(cls, session, email: str):
-        record = await session.execute(select(KAIUser).where(KAIUser.email == email))
-
-        return record.scalar()
