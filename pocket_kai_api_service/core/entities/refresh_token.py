@@ -15,4 +15,4 @@ class RefreshTokenEntity(BaseEntity):
     last_used_at: datetime | None
     revoked_at: datetime | None
 
-    pocket_kai_user_id: UUID
+    user_id: UUID

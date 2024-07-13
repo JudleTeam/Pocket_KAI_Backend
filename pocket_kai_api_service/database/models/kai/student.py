@@ -8,18 +8,18 @@ from sqlalchemy_utils import StringEncryptedType
 import sqlalchemy as sa
 
 from config import get_settings
-from database.models.base import Base
+from database.models.base import BaseModel
 
 if TYPE_CHECKING:
-    from database.models import PocketKAIUser
-    from database.models.kai import Group
+    from database.models import UserModel
+    from database.models.kai import GroupModel
 
 
 settings = get_settings()
 
 
-class KAIUser(Base):
-    __tablename__ = 'kai_user'
+class StudentModel(BaseModel):
+    __tablename__ = 'student'
 
     kai_id: Mapped[int | None] = mapped_column(sa.BigInteger, unique=True)
 
@@ -47,15 +47,15 @@ class KAIUser(Base):
     status: Mapped[str | None] = mapped_column()
 
     group_id: Mapped[UUID] = mapped_column(
-        ForeignKey('group.id', name='fk_kai_user_group'),
+        ForeignKey('group.id', name='fk_student_group'),
     )
-    pocket_kai_user_id: Mapped[UUID | None] = mapped_column(
-        ForeignKey('pocket_kai_user.id'),
+    user_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey('user.id'),
         unique=True,
     )
 
-    group: Mapped['Group'] = relationship(
+    group: Mapped['GroupModel'] = relationship(
         foreign_keys=[group_id],
         back_populates='members',
     )
-    pocket_kai_user: Mapped['PocketKAIUser'] = relationship(back_populates='kai_user')
+    user: Mapped['UserModel'] = relationship(back_populates='student')

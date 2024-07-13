@@ -6,15 +6,20 @@ from sqlalchemy import ARRAY, ForeignKey, Date
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
-from database.models.base import Base
+from database.models.base import BaseModel
 
 
 if TYPE_CHECKING:
-    from database.models.kai import Discipline, Teacher, Group, Department
+    from database.models.kai import (
+        DisciplineModel,
+        TeacherModel,
+        GroupModel,
+        DepartmentModel,
+    )
 
 
-class GroupLesson(Base):
-    __tablename__ = 'group_lesson'
+class LessonModel(BaseModel):
+    __tablename__ = 'lesson'
 
     number_of_day: Mapped[int] = mapped_column()
     original_dates: Mapped[str | None] = mapped_column()
@@ -35,11 +40,11 @@ class GroupLesson(Base):
     teacher_id: Mapped[UUID | None] = mapped_column(ForeignKey('teacher.id'))
     group_id: Mapped[UUID] = mapped_column(ForeignKey('group.id'))
 
-    department: Mapped[Optional['Department']] = relationship(lazy='selectin')
-    discipline: Mapped['Discipline'] = relationship(lazy='selectin')
+    department: Mapped[Optional['DepartmentModel']] = relationship(lazy='selectin')
+    discipline: Mapped['DisciplineModel'] = relationship(lazy='selectin')
     # Если teacher = None, значит стоит "Преподаватель кафедры"
-    teacher: Mapped[Optional['Teacher']] = relationship(lazy='selectin')
-    group: Mapped['Group'] = relationship(lazy='selectin')
+    teacher: Mapped[Optional['TeacherModel']] = relationship(lazy='selectin')
+    group: Mapped['GroupModel'] = relationship(lazy='selectin')
 
     def __repr__(self):
         return f'{self.original_dates} | {self.start_time.strftime("%H:%M")} | {self.discipline.name}'

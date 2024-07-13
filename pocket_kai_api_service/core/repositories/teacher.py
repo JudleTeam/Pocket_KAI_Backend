@@ -6,7 +6,7 @@ from sqlalchemy import select
 from core.entities.teacher import TeacherEntity
 from core.exceptions.base import EntityNotFoundError
 from core.repositories.base import GenericRepository, GenericSARepository
-from database.models.kai import Teacher
+from database.models.kai import TeacherModel
 
 
 class TeacherRepositoryBase(GenericRepository[TeacherEntity], ABC):
@@ -27,10 +27,10 @@ class TeacherRepositoryBase(GenericRepository[TeacherEntity], ABC):
 
 
 class SATeacherRepository(GenericSARepository[TeacherEntity], TeacherRepositoryBase):
-    model_cls = Teacher
+    model_cls = TeacherModel
 
     async def get_by_login(self, login: str) -> TeacherEntity:
-        stmt = select(Teacher).where(Teacher.login == login)
+        stmt = select(TeacherModel).where(TeacherModel.login == login)
         teacher = await self._session.scalar(stmt)
         if teacher is None:
             raise EntityNotFoundError(entity=TeacherEntity, find_query=login)
@@ -42,7 +42,7 @@ class SATeacherRepository(GenericSARepository[TeacherEntity], TeacherRepositoryB
         name: str,
         department_id: UUID | None,
     ) -> TeacherEntity:
-        new_teacher = Teacher(login=login, name=name, department_id=department_id)
+        new_teacher = TeacherModel(login=login, name=name, department_id=department_id)
         await self._add(new_teacher)
         await self._session.refresh(new_teacher, ['department'])
         return await self._convert_db_to_entity(new_teacher)

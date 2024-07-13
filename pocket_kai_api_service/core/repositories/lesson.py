@@ -7,7 +7,7 @@ from sqlalchemy import select
 from core.entities.lesson import LessonEntity
 from core.entities.common import ParsedDatesStatus, WeekParity
 from core.repositories.base import GenericRepository, GenericSARepository
-from database.models.kai import GroupLesson
+from database.models.kai import LessonModel
 
 
 class LessonRepositoryBase(GenericRepository[LessonEntity], ABC):
@@ -44,7 +44,7 @@ class LessonRepositoryBase(GenericRepository[LessonEntity], ABC):
 
 
 class SALessonRepository(GenericSARepository[LessonEntity], LessonRepositoryBase):
-    model_cls = GroupLesson
+    model_cls = LessonModel
 
     async def get_by_group_id(
         self,
@@ -57,12 +57,12 @@ class SALessonRepository(GenericSARepository[LessonEntity], LessonRepositoryBase
             parities = {WeekParity.any, week_parity}
 
         stmt = (
-            select(GroupLesson)
+            select(LessonModel)
             .where(
-                GroupLesson.group_id == group_id,
-                GroupLesson.parsed_parity.in_(parities),
+                LessonModel.group_id == group_id,
+                LessonModel.parsed_parity.in_(parities),
             )
-            .order_by(GroupLesson.number_of_day, GroupLesson.start_time)
+            .order_by(LessonModel.number_of_day, LessonModel.start_time)
         )
         lessons = await self._session.scalars(stmt)
         return [await self._convert_db_to_entity(lesson) for lesson in lessons.all()]
@@ -85,7 +85,7 @@ class SALessonRepository(GenericSARepository[LessonEntity], LessonRepositoryBase
         department_id: UUID | None,
         group_id: UUID,
     ) -> LessonEntity:
-        new_lesson = GroupLesson(
+        new_lesson = LessonModel(
             number_of_day=number_of_day,
             original_dates=original_dates,
             parsed_parity=parsed_parity,

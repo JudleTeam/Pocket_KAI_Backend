@@ -6,7 +6,7 @@ from .department import router as department_router
 from .discipline import router as discipline_router
 from .lesson import router as lesson_router
 from .auth import router as auth_router
-from .pocket_kai_user import router as user_router
+from .user import router as user_router
 
 
 router = APIRouter()

@@ -11,7 +11,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 import sqlalchemy as sa
 
 
-class Base(AsyncAttrs, DeclarativeBase):
+class BaseModel(AsyncAttrs, DeclarativeBase):
     id: Mapped[UUID] = mapped_column(
         primary_key=True,
         server_default=text('gen_random_uuid()'),

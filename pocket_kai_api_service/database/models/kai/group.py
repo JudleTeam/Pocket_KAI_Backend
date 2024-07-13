@@ -6,18 +6,24 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 import sqlalchemy as sa
 
-from database.models.base import Base
+from database.models.base import BaseModel
 
 
 if TYPE_CHECKING:
-    from database.models.kai import Speciality, Profile, Department, Institute, KAIUser
+    from database.models.kai import (
+        SpecialityModel,
+        ProfileModel,
+        DepartmentModel,
+        InstituteModel,
+        StudentModel,
+    )
 
 
-class Group(Base):
+class GroupModel(BaseModel):
     __tablename__ = 'group'
 
     kai_id: Mapped[int] = mapped_column(sa.BigInteger, unique=True)
-    group_leader_id: Mapped[UUID | None] = mapped_column(ForeignKey('kai_user.id'))
+    group_leader_id: Mapped[UUID | None] = mapped_column(ForeignKey('student.id'))
     pinned_text: Mapped[str | None] = mapped_column()
     group_name: Mapped[str] = mapped_column(unique=True)
 
@@ -37,13 +43,13 @@ class Group(Base):
     institute_id: Mapped[UUID | None] = mapped_column(ForeignKey('institute.id'))
     department_id: Mapped[UUID | None] = mapped_column(ForeignKey('department.id'))
 
-    speciality: Mapped['Speciality'] = relationship(lazy='selectin')
-    profile: Mapped['Profile'] = relationship(lazy='selectin')
-    departament: Mapped['Department'] = relationship(lazy='selectin')
-    institute: Mapped['Institute'] = relationship(lazy='selectin')
+    speciality: Mapped['SpecialityModel'] = relationship(lazy='selectin')
+    profile: Mapped['ProfileModel'] = relationship(lazy='selectin')
+    departament: Mapped['DepartmentModel'] = relationship(lazy='selectin')
+    institute: Mapped['InstituteModel'] = relationship(lazy='selectin')
 
-    group_leader: Mapped['KAIUser'] = relationship(foreign_keys=[group_leader_id])
-    members: Mapped[list['KAIUser']] = relationship(
+    group_leader: Mapped['StudentModel'] = relationship(foreign_keys=[group_leader_id])
+    members: Mapped[list['StudentModel']] = relationship(
         back_populates='group',
-        foreign_keys='[KAIUser.group_id]',
+        foreign_keys='[StudentModel.group_id]',
     )

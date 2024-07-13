@@ -5,15 +5,15 @@ from fastapi import Depends
 from core.repositories.department import DepartmentRepositoryBase
 from core.repositories.discipline import DisciplineRepositoryBase
 from core.repositories.group import GroupRepositoryBase
-from core.repositories.kai_user import KaiUserRepositoryBase
+from core.repositories.student import StudentRepositoryBase
 from core.repositories.lesson import LessonRepositoryBase
-from core.repositories.pocket_kai_user import PocketKaiUserRepositoryBase
+from core.repositories.user import UserRepositoryBase
 from core.repositories.providers import (
     get_discipline_repository,
     get_group_repository,
-    get_kai_user_repository,
+    get_student_repository,
     get_lesson_repository,
-    get_pocket_kai_user_repository,
+    get_user_repository,
     get_refresh_token_repository,
     get_service_token_repository,
     get_teacher_repository,
@@ -28,9 +28,9 @@ from core.services.auth import AuthService, AuthServiceBase
 from core.services.department import DepartmentServiceBase, DepartmentService
 from core.services.discipline import DisciplineService, DisciplineServiceBase
 from core.services.group import GroupService, GroupServiceBase
-from core.services.kai_user import KaiUserService, KaiUserServiceBase
+from core.services.student import StudentService, StudentServiceBase
 from core.services.lesson import LessonService, LessonServiceBase
-from core.services.pocket_kai_user import PocketKaiUserService, PocketKaiUserServiceBase
+from core.services.user import UserService, UserServiceBase
 from core.services.schedule import ScheduleService, ScheduleServiceBase
 from core.services.service_token import ServiceTokenService, ServiceTokenServiceBase
 from core.services.teacher import TeacherServiceBase, TeacherService
@@ -122,42 +122,36 @@ def get_discipline_service(
     )
 
 
-def get_pocket_kai_user_service(
-    pocket_kai_user_repository: Annotated[
-        PocketKaiUserRepositoryBase,
-        Depends(get_pocket_kai_user_repository),
-    ],
+def get_user_service(
+    user_repository: Annotated[UserRepositoryBase, Depends(get_user_repository)],
     unit_of_work: UOWDep,
     jwt_manager: Annotated[JWTManagerProtocol, Depends(get_jwt_manager)],
-) -> PocketKaiUserServiceBase:
-    return PocketKaiUserService(
-        pocket_kai_user_repository=pocket_kai_user_repository,
+) -> UserServiceBase:
+    return UserService(
+        user_repository=user_repository,
         uow=unit_of_work,
         jwt_manager=jwt_manager,
     )
 
 
-def get_kai_user_service(
-    kai_user_repository: Annotated[
-        KaiUserRepositoryBase,
-        Depends(get_kai_user_repository),
+def get_student_service(
+    student_repository: Annotated[
+        StudentRepositoryBase,
+        Depends(get_student_repository),
     ],
     unit_of_work: UOWDep,
-) -> KaiUserServiceBase:
-    return KaiUserService(
-        kai_user_repository=kai_user_repository,
+) -> StudentServiceBase:
+    return StudentService(
+        student_repository=student_repository,
         uow=unit_of_work,
     )
 
 
 def get_auth_service(
-    pocket_kai_user_repository: Annotated[
-        PocketKaiUserRepositoryBase,
-        Depends(get_pocket_kai_user_repository),
-    ],
-    kai_user_repository: Annotated[
-        KaiUserRepositoryBase,
-        Depends(get_kai_user_repository),
+    user_repository: Annotated[UserRepositoryBase, Depends(get_user_repository)],
+    student_repository: Annotated[
+        StudentRepositoryBase,
+        Depends(get_student_repository),
     ],
     refresh_token_repository: Annotated[
         RefreshTokenRepositoryBase,
@@ -169,8 +163,8 @@ def get_auth_service(
     jwt_manager: Annotated[JWTManagerProtocol, Depends(get_jwt_manager)],
 ) -> AuthServiceBase:
     return AuthService(
-        pocket_kai_user_repository=pocket_kai_user_repository,
-        kai_user_repository=kai_user_repository,
+        user_repository=user_repository,
+        student_repository=student_repository,
         refresh_token_repository=refresh_token_repository,
         group_repository=group_repository,
         uow=uow,

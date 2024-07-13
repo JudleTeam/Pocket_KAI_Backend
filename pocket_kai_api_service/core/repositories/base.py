@@ -12,7 +12,7 @@ from core.exceptions.base import (
     EntityNotFoundError,
     EntityAlreadyExistsError,
 )
-from database.models.base import Base
+from database.models.base import BaseModel
 
 
 class GenericRepository[T: BaseEntity](ABC):
@@ -64,7 +64,7 @@ class GenericRepository[T: BaseEntity](ABC):
 
 
 class GenericSARepository[T: BaseEntity](GenericRepository[T], ABC):
-    model_cls: Type[Base]
+    model_cls: Type[BaseModel]
 
     def __init__(self, session: AsyncSession) -> None:
         """
@@ -74,10 +74,10 @@ class GenericSARepository[T: BaseEntity](GenericRepository[T], ABC):
         """
         self._session = session
 
-    async def _convert_db_to_entity(self, record: Base, **kwargs) -> T:
+    async def _convert_db_to_entity(self, record: BaseModel, **kwargs) -> T:
         return self.entity.model_validate(record)
 
-    async def _convert_entity_to_db(self, entity: T, **kwargs) -> Base:
+    async def _convert_entity_to_db(self, entity: T, **kwargs) -> BaseModel:
         return self.model_cls(**entity.model_dump())
 
     async def _convert_entity_to_update_dict(self, entity: T, **kwargs) -> dict:
@@ -119,7 +119,7 @@ class GenericSARepository[T: BaseEntity](GenericRepository[T], ABC):
 
         return stmt
 
-    async def _add(self, record: Base):
+    async def _add(self, record: BaseModel):
         self._session.add(record)
         try:
             await self._session.flush()

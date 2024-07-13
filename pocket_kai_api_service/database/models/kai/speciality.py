@@ -1,10 +1,10 @@
 from sqlalchemy.orm import mapped_column, Mapped
 import sqlalchemy as sa
 
-from database.models.base import Base
+from database.models.base import BaseModel
 
 
-class Speciality(Base):
+class SpecialityModel(BaseModel):
     __tablename__ = 'speciality'
 
     kai_id: Mapped[int] = mapped_column(sa.BigInteger, unique=True)

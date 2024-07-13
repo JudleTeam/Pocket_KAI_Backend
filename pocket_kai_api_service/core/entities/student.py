@@ -1,16 +1,15 @@
 from uuid import UUID
 
-from datetime import date, datetime
+from datetime import date
 
-from pydantic import BaseModel
+from core.entities.base import BaseEntity
 
 
-class KaiUserRead(BaseModel):
-    id: UUID
-    created_at: datetime
+class StudentEntity(BaseEntity):
     kai_id: int | None
     position: int | None
     login: str | None
+    password: str | None
     full_name: str
     phone: str | None
     email: str
@@ -27,4 +26,4 @@ class KaiUserRead(BaseModel):
     status: str | None
 
     group_id: UUID
-    pocket_kai_user_id: UUID | None
+    user_id: UUID | None

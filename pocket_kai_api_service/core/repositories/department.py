@@ -5,7 +5,7 @@ from sqlalchemy import select
 from core.entities.department import DepartmentEntity
 from core.exceptions.base import EntityNotFoundError
 from core.repositories.base import GenericRepository, GenericSARepository
-from database.models.kai import Department
+from database.models.kai import DepartmentModel
 
 
 class DepartmentRepositoryBase(GenericRepository[DepartmentEntity], ABC):
@@ -28,10 +28,10 @@ class SADepartmentRepository(
     GenericSARepository[DepartmentEntity],
     DepartmentRepositoryBase,
 ):
-    model_cls = Department
+    model_cls = DepartmentModel
 
     async def get_by_kai_id(self, kai_id: int) -> DepartmentEntity:
-        stmt = select(Department).where(Department.kai_id == kai_id)
+        stmt = select(DepartmentModel).where(DepartmentModel.kai_id == kai_id)
         department = await self._session.scalar(stmt)
         if department is None:
             raise EntityNotFoundError(entity=DepartmentEntity, find_query=kai_id)
@@ -42,6 +42,6 @@ class SADepartmentRepository(
         kai_id: int,
         name: str,
     ) -> DepartmentEntity:
-        new_department = Department(kai_id=kai_id, name=name)
+        new_department = DepartmentModel(kai_id=kai_id, name=name)
         await self._add(new_department)
         return await self._convert_db_to_entity(new_department)

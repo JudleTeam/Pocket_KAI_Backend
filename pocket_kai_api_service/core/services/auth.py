@@ -6,8 +6,8 @@ from abc import ABC, abstractmethod
 
 from core.exceptions.base import EntityNotFoundError
 from core.repositories.group import GroupRepositoryBase
-from core.repositories.kai_user import KaiUserRepositoryBase
-from core.repositories.pocket_kai_user import PocketKaiUserRepositoryBase
+from core.repositories.student import StudentRepositoryBase
+from core.repositories.user import UserRepositoryBase
 from core.repositories.refresh_token import RefreshTokenRepositoryBase
 from core.security.jwt import JWTManagerProtocol
 from core.unit_of_work import UnitOfWorkBase
@@ -17,16 +17,16 @@ from utils.kai_parser_api.api import KaiParserApi
 class AuthServiceBase(ABC):
     def __init__(
         self,
-        pocket_kai_user_repository: PocketKaiUserRepositoryBase,
-        kai_user_repository: KaiUserRepositoryBase,
+        user_repository: UserRepositoryBase,
+        student_repository: StudentRepositoryBase,
         refresh_token_repository: RefreshTokenRepositoryBase,
         group_repository: GroupRepositoryBase,
         uow: UnitOfWorkBase,
         kai_parser_api: KaiParserApi,
         jwt_manager: JWTManagerProtocol,
     ):
-        self.pocket_kai_user_repository = pocket_kai_user_repository
-        self.kai_user_repository = kai_user_repository
+        self.user_repository = user_repository
+        self.student_repository = student_repository
         self.refresh_token_repository = refresh_token_repository
         self.group_repository = group_repository
         self.uow = uow
@@ -47,7 +47,7 @@ class AuthService(AuthServiceBase):
         user_about, user_info = await self.kai_parser_api.kai_login(username, password)
 
         try:
-            kai_user = await self.kai_user_repository.get_by_email(
+            student = await self.student_repository.get_by_email(
                 email=user_info.email,
             )
         except EntityNotFoundError:
@@ -55,7 +55,7 @@ class AuthService(AuthServiceBase):
                 group_name=str(user_about.groupNum),
             )
 
-            kai_user = await self.kai_user_repository.create(
+            student = await self.student_repository.create(
                 kai_id=user_about.studId,
                 position=None,
                 login=username,
@@ -75,30 +75,30 @@ class AuthService(AuthServiceBase):
                 program_form=user_about.programForm,
                 status=user_about.status,
                 group_id=group.id,
-                pocket_kai_user_id=None,
+                user_id=None,
             )
 
-        if kai_user.pocket_kai_user_id is None:
-            pocket_kai_user = await self.pocket_kai_user_repository.create(
+        if student.user_id is None:
+            user = await self.user_repository.create(
                 telegram_id=None,
                 phone=None,
                 is_blocked=False,
             )
 
-            kai_user.pocket_kai_user_id = pocket_kai_user.id
-            kai_user = await self.kai_user_repository.update(kai_user)
+            student.user_id = user.id
+            student = await self.student_repository.update(student)
         else:
-            pocket_kai_user = await self.pocket_kai_user_repository.get_by_id(
-                kai_user.pocket_kai_user_id,
+            user = await self.user_repository.get_by_id(
+                student.user_id,
             )
 
         access_token = self.jwt_manager.create_access_token(
-            user_id=str(pocket_kai_user.id),
+            user_id=str(user.id),
         )
         refresh_token_id = uuid4()
         refresh_token = self.jwt_manager.create_refresh_token(
             jti=str(refresh_token_id),
-            user_id=str(pocket_kai_user.id),
+            user_id=str(user.id),
         )
         refresh_token_payload = self.jwt_manager.decode_refresh_token(refresh_token)
 
@@ -108,7 +108,7 @@ class AuthService(AuthServiceBase):
             name=None,
             issued_at=refresh_token_payload.iat,
             expires_at=refresh_token_payload.exp,
-            pocket_kai_user_id=pocket_kai_user.id,
+            user_id=user.id,
         )
         await self.uow.commit()
 
@@ -116,7 +116,7 @@ class AuthService(AuthServiceBase):
 
     async def refresh_token_pair(self, refresh_token: str) -> tuple[str, str]:
         refresh_token_payload = self.jwt_manager.decode_refresh_token(refresh_token)
-        pocket_kai_user = await self.pocket_kai_user_repository.get_by_id(
+        user = await self.user_repository.get_by_id(
             refresh_token_payload.sub,
         )
 
@@ -126,7 +126,7 @@ class AuthService(AuthServiceBase):
         # Время жизни обновляется
         new_refresh_token = self.jwt_manager.create_refresh_token(
             jti=str(refresh_token_payload.jti),
-            user_id=str(pocket_kai_user.id),
+            user_id=str(user.id),
         )
         new_refresh_token_payload = self.jwt_manager.decode_refresh_token(
             new_refresh_token,
@@ -141,6 +141,6 @@ class AuthService(AuthServiceBase):
         await self.uow.commit()
 
         new_access_token = self.jwt_manager.create_access_token(
-            user_id=str(pocket_kai_user.id),
+            user_id=str(user.id),
         )
         return new_access_token, new_refresh_token

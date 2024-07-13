@@ -3,16 +3,16 @@ from typing import TYPE_CHECKING
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import sqlalchemy as sa
 
-from database.models.base import Base
+from database.models.base import BaseModel
 
 
 if TYPE_CHECKING:
-    from database.models import RefreshToken
-    from database.models.kai import KAIUser
+    from database.models import RefreshTokenModel
+    from database.models.kai import StudentModel
 
 
-class PocketKAIUser(Base):
-    __tablename__ = 'pocket_kai_user'
+class UserModel(BaseModel):
+    __tablename__ = 'user'
 
     telegram_id: Mapped[int | None] = mapped_column(
         sa.BigInteger,
@@ -24,11 +24,11 @@ class PocketKAIUser(Base):
 
     is_blocked: Mapped[bool] = mapped_column(default=False)
 
-    refresh_tokens: Mapped['RefreshToken'] = relationship(
-        back_populates='pocket_kai_user',
-        foreign_keys='[RefreshToken.pocket_kai_user_id]',
+    refresh_tokens: Mapped['RefreshTokenModel'] = relationship(
+        back_populates='user',
+        foreign_keys='[RefreshTokenModel.user_id]',
     )
-    kai_user: Mapped['KAIUser'] = relationship(
-        back_populates='pocket_kai_user',
-        foreign_keys='[KAIUser.pocket_kai_user_id]',
+    student: Mapped['StudentModel'] = relationship(
+        back_populates='user',
+        foreign_keys='[StudentModel.user_id]',
     )

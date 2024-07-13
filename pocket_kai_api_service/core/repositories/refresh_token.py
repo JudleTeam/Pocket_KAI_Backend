@@ -7,7 +7,7 @@ from sqlalchemy import select
 from core.entities.refresh_token import RefreshTokenEntity
 from core.exceptions.base import EntityNotFoundError
 from core.repositories.base import GenericRepository, GenericSARepository
-from database.models import RefreshToken
+from database.models import RefreshTokenModel
 
 
 class RefreshTokenRepositoryBase(GenericRepository[RefreshTokenEntity], ABC):
@@ -20,7 +20,7 @@ class RefreshTokenRepositoryBase(GenericRepository[RefreshTokenEntity], ABC):
         name: str | None,
         issued_at: datetime,
         expires_at: datetime,
-        pocket_kai_user_id: UUID,
+        user_id: UUID,
     ) -> RefreshTokenEntity:
         raise NotImplementedError
 
@@ -32,7 +32,7 @@ class SARefreshTokenRepository(
     GenericSARepository[RefreshTokenEntity],
     RefreshTokenRepositoryBase,
 ):
-    model_cls = RefreshToken
+    model_cls = RefreshTokenModel
 
     async def create(
         self,
@@ -41,15 +41,15 @@ class SARefreshTokenRepository(
         name: str | None,
         issued_at: datetime,
         expires_at: datetime,
-        pocket_kai_user_id: UUID,
+        user_id: UUID,
     ) -> RefreshTokenEntity:
-        refresh_token = RefreshToken(
+        refresh_token = RefreshTokenModel(
             id=id,
             token=token,
             name=name,
             issued_at=issued_at.replace(tzinfo=None),
             expires_at=expires_at.replace(tzinfo=None),
-            pocket_kai_user_id=pocket_kai_user_id,
+            user_id=user_id,
         )
 
         await self._add(refresh_token)
@@ -58,7 +58,7 @@ class SARefreshTokenRepository(
 
     async def get_by_token(self, token: str) -> RefreshTokenEntity:
         record = await self.session.scalar(
-            select(RefreshToken).where(RefreshToken.token == token),
+            select(RefreshTokenModel).where(RefreshTokenModel.token == token),
         )
 
         if record is None:

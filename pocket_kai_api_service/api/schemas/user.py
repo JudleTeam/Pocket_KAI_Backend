@@ -5,7 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 
-class PocketKaiUserRead(BaseModel):
+class UserRead(BaseModel):
     id: UUID
     created_at: datetime
     telegram_id: int | None

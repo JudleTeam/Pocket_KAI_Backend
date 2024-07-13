@@ -7,14 +7,14 @@ from uuid import UUID
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from database.models.base import Base
+from database.models.base import BaseModel
 
 
 if TYPE_CHECKING:
-    from database.models import PocketKAIUser
+    from database.models import UserModel
 
 
-class RefreshToken(Base):
+class RefreshTokenModel(BaseModel):
     __tablename__ = 'refresh_token'
 
     token: Mapped[str] = mapped_column(unique=True, index=True)
@@ -26,8 +26,8 @@ class RefreshToken(Base):
     last_used_at: Mapped[datetime | None] = mapped_column()
     revoked_at: Mapped[datetime | None] = mapped_column()
 
-    pocket_kai_user_id: Mapped[UUID] = mapped_column(ForeignKey('pocket_kai_user.id'))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey('user.id'))
 
-    pocket_kai_user: Mapped['PocketKAIUser'] = relationship(
+    user: Mapped['UserModel'] = relationship(
         back_populates='refresh_tokens',
     )
