@@ -4,6 +4,7 @@ from fastapi import APIRouter, Query
 
 from api.dependencies import TaskServiceDep
 from api.schemas.task import TaskRead
+from core.common import TaskStatus, TaskType
 
 
 router = APIRouter()
@@ -18,6 +19,8 @@ async def get_all_tasks(
     offset: Annotated[int, Query(ge=0)] = 0,
     group_name: str | None = None,
     login: str | None = None,
+    type: TaskType | None = None,
+    status: TaskStatus | None = None,
     *,
     task_service: TaskServiceDep,
 ):
@@ -26,4 +29,6 @@ async def get_all_tasks(
         offset=offset,
         group_name=group_name,
         login=login,
+        type=type,
+        status=status,
     )

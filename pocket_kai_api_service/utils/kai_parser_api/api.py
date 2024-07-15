@@ -52,6 +52,8 @@ class KaiParserApi:
         offset: int,
         group_name: str | None,
         login: str | None,
+        type: str | None = None,
+        status: str | None = None,
     ):
         params = {
             'limit': limit,
@@ -61,6 +63,10 @@ class KaiParserApi:
             params['group_name'] = group_name
         if login is not None:
             params['login'] = login
+        if type is not None:
+            params['type'] = type
+        if status is not None:
+            params['status'] = status
 
         async with self.session.get(
             url=self.base_url + '/task',

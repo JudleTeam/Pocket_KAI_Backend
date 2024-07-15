@@ -38,6 +38,8 @@ class TaskServiceBase(ABC):
         offset: int,
         group_name: str | None,
         login: str | None,
+        type: TaskType | None,
+        status: TaskStatus | None,
     ) -> list[TaskEntity]:
         raise NotImplementedError
 
@@ -69,14 +71,17 @@ class TaskService(TaskServiceBase):
         offset: int,
         group_name: str | None,
         login: str | None,
+        type: TaskType | None,
+        status: TaskStatus | None,
     ) -> list[TaskEntity]:
-        filters = dict()
-        if group_name is not None:
-            filters['group_name'] = group_name
-        if login is not None:
-            filters['login'] = login
-
-        return await self.task_repository.list(limit=limit, offset=offset, **filters)
+        return await self.task_repository.get_tasks_order_by_created_at(
+            limit=limit,
+            offset=offset,
+            group_name=group_name,
+            login=login,
+            type=type,
+            status=status,
+        )
 
     async def update(self, task: TaskEntity) -> TaskEntity:
         task = await self.task_repository.update(task)
