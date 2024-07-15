@@ -28,6 +28,8 @@ class AuthUseCase:
         self.uow = uow
 
     async def login_by_kai(self, username: str, password: str) -> tuple[str, str]:
+        username = username.lower()
+
         user_about, user_info = await self.kai_parser_api.kai_login(username, password)
 
         group = await self.group_service.add_additional_data_from_user_about(
