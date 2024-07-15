@@ -1,6 +1,5 @@
 import datetime as dt
 from enum import Enum
-from typing import Union
 
 
 class LessonType(str, Enum):
@@ -16,18 +15,32 @@ class LessonType(str, Enum):
 
 
 class WeekParity(str, Enum):
-    odd = 'odd'
-    even = 'even'
-    any = 'any'
+    ODD = 'odd'  # Нечётная
+    EVEN = 'even'  # Чётная
+    ANY = 'any'  # Нечётная / Чётная
 
     @classmethod
     def get_parity_for_date(
         cls,
         date: dt.date,
-    ) -> Union['WeekParity.even', 'WeekParity.odd']:
+    ) -> 'WeekParity':
+        """
+        Value could be either ODD or EVEN
+        """
         if int(date.strftime('%V')) % 2 == 1:
-            return cls.odd
-        return cls.even
+            return cls(cls.ODD)
+        return cls(cls.EVEN)
+
+    def to_int(self) -> int:
+        if self.value == self.ODD:
+            return 1
+
+        if self.value == self.EVEN:
+            return 0
+
+        raise ValueError(
+            'WeekParity should be either ODD or EVEN to be converted to int',
+        )
 
 
 class ParsedDatesStatus(str, Enum):

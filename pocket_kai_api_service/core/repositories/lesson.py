@@ -38,7 +38,7 @@ class LessonRepositoryBase(GenericRepository[LessonEntity], ABC):
     async def get_by_group_id(
         self,
         group_id: UUID,
-        week_parity: WeekParity = WeekParity.any,
+        week_parity: WeekParity = WeekParity.ANY,
     ) -> list[LessonEntity]:
         raise NotImplementedError
 
@@ -49,12 +49,12 @@ class SALessonRepository(GenericSARepository[LessonEntity], LessonRepositoryBase
     async def get_by_group_id(
         self,
         group_id: UUID,
-        week_parity: WeekParity = WeekParity.any,
+        week_parity: WeekParity = WeekParity.ANY,
     ) -> list[LessonEntity]:
-        if week_parity == WeekParity.any:
-            parities = {WeekParity.any, WeekParity.odd, WeekParity.even}
+        if week_parity == WeekParity.ANY:
+            parities = {WeekParity.ANY, WeekParity.ODD, WeekParity.EVEN}
         else:
-            parities = {WeekParity.any, week_parity}
+            parities = {WeekParity.ANY, week_parity}
 
         stmt = (
             select(LessonModel)

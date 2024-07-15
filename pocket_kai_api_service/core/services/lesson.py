@@ -22,7 +22,7 @@ class LessonServiceBase(Protocol):
     async def get_by_group_id(
         self,
         group_id: UUID,
-        week_parity: WeekParity = WeekParity.any,
+        week_parity: WeekParity = WeekParity.ANY,
     ) -> list[LessonEntity]:
         raise NotImplementedError
 
@@ -47,7 +47,7 @@ class LessonService(LessonServiceBase):
     async def get_by_group_id(
         self,
         group_id: UUID,
-        week_parity: WeekParity = WeekParity.any,
+        week_parity: WeekParity = WeekParity.ANY,
     ) -> list[LessonEntity]:
         return await self.lesson_repository.get_by_group_id(
             group_id,

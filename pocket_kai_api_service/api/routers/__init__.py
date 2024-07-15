@@ -9,6 +9,7 @@ from .auth import router as auth_router
 from .user import router as user_router
 from .student import router as student_router
 from .task import router as task_router
+from .common import router as common_router
 
 
 router = APIRouter()
@@ -22,3 +23,4 @@ router.include_router(auth_router, prefix='/auth', tags=['Auth'])
 router.include_router(user_router, prefix='/user', tags=['User'])
 router.include_router(student_router, prefix='/student', tags=['Students'])
 router.include_router(task_router, prefix='/task', tags=['Tasks'])
+router.include_router(common_router, tags=['Common'])

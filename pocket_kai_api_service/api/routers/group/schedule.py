@@ -25,7 +25,7 @@ router = APIRouter()
 )
 async def get_week_schedule_by_group_name(
     group_name: str,
-    week_parity: Annotated[WeekParity, Query()] = WeekParity.any,
+    week_parity: Annotated[WeekParity, Query()] = WeekParity.ANY,
     *,
     schedule_service: ScheduleServiceDep,
 ):
@@ -54,7 +54,7 @@ async def get_week_schedule_by_group_name(
 )
 async def get_week_schedule_by_group_id(
     group_id: UUID,
-    week_parity: Annotated[WeekParity, Query()] = WeekParity.any,
+    week_parity: Annotated[WeekParity, Query()] = WeekParity.ANY,
     *,
     schedule_service: ScheduleServiceDep,
 ):

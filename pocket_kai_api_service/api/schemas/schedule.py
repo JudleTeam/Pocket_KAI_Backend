@@ -12,7 +12,7 @@ class ScheduleResponse(TunedModel):
 
 class DayResponse(TunedModel):
     date: dt.date
-    parity: WeekParity = WeekParity.any
+    parity: WeekParity = WeekParity.ANY
     lessons: list[LessonRead]
 
 

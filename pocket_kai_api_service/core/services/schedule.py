@@ -69,7 +69,7 @@ class ScheduleService(ScheduleServiceBase):
                 if date in lesson.parsed_dates:
                     filtered_lessons.append(lesson)
             elif lesson.number_of_day == day_number and lesson.parsed_parity in (
-                WeekParity.any,
+                WeekParity.ANY,
                 date_week_parity,
             ):
                 filtered_lessons.append(lesson)
