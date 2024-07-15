@@ -11,6 +11,7 @@ router = APIRouter()
 @router.post(
     '/add_group_members',
     dependencies=[Depends(check_service_token)],
+    include_in_schema=False,
 )
 async def add_group_members(
     request_data: AddGroupMembersRequest,

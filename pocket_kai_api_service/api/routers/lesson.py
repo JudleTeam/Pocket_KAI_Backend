@@ -14,6 +14,8 @@ router = APIRouter()
     '',
     dependencies=[Depends(check_service_token)],
     response_model=LessonRead,
+    status_code=status.HTTP_201_CREATED,
+    include_in_schema=False,
 )
 async def create_lesson(
     lesson_create: LessonCreate,
@@ -32,6 +34,7 @@ async def create_lesson(
     '/{lesson_id}',
     dependencies=[Depends(check_service_token)],
     response_model=LessonRead,
+    include_in_schema=False,
 )
 async def update_lesson(
     lesson_id: UUID,
@@ -53,6 +56,7 @@ async def update_lesson(
     '/{lesson_id}',
     dependencies=[Depends(check_service_token)],
     status_code=status.HTTP_204_NO_CONTENT,
+    include_in_schema=False,
 )
 async def delete_lesson(
     lesson_id: UUID,

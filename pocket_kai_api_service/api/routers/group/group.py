@@ -109,6 +109,7 @@ async def suggest_group_by_name(
     '/',
     dependencies=[Depends(check_service_token)],
     response_model=FullGroupRead,
+    include_in_schema=False,
 )
 async def create_group(
     group_create: GroupCreate,
@@ -127,6 +128,7 @@ async def create_group(
     '/by_name/{group_name}',
     dependencies=[Depends(check_service_token)],
     response_model=FullGroupRead,
+    include_in_schema=False,
 )
 async def patch_group_by_name(
     group_name: str,
@@ -146,6 +148,7 @@ async def patch_group_by_name(
     '/by_id/{group_id}',
     dependencies=[Depends(check_service_token)],
     response_model=FullGroupRead,
+    include_in_schema=False,
 )
 async def patch_group_by_id(
     group_id: UUID,

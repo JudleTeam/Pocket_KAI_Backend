@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from api.dependencies import check_service_token, TeacherServiceDep
+from api.schemas.common import ErrorMessage
 from api.schemas.teacher import TeacherCreate, TeacherRead
 from core.exceptions.base import (
     EntityAlreadyExistsError,
@@ -15,11 +16,21 @@ router = APIRouter()
 @router.get(
     '/by_login/{login}',
     response_model=TeacherRead,
+    responses={
+        404: {
+            'description': 'Преподаватель не найден',
+            'model': ErrorMessage,
+        },
+    },
 )
 async def get_teacher_by_login(
     login: str,
     teacher_service: TeacherServiceDep,
 ):
+    """
+    Возвращает преподавателя по его логину с сайта КАИ.
+    *Берётся из базы данных Pocket KAI, а не сайта КАИ!*
+    """
     try:
         return await teacher_service.get_by_login(login=login)
     except EntityNotFoundError as error:
@@ -30,6 +41,7 @@ async def get_teacher_by_login(
     '',
     response_model=TeacherRead,
     dependencies=[Depends(check_service_token)],
+    include_in_schema=False,
 )
 async def create_teacher(
     teacher_create: TeacherCreate,

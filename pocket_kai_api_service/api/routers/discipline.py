@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from api.dependencies import DisciplineServiceDep, check_service_token
+from api.schemas.common import ErrorMessage
 from api.schemas.discipline import DisciplineCreate, DisciplineRead
 from core.exceptions.base import EntityAlreadyExistsError, EntityNotFoundError
 
@@ -11,11 +12,21 @@ router = APIRouter()
 @router.get(
     '/by_kai_id/{kai_id}',
     response_model=DisciplineRead,
+    responses={
+        404: {
+            'description': 'Дисциплина не найдена',
+            'model': ErrorMessage,
+        },
+    },
 )
 async def get_discipline_by_kai_id(
     kai_id: int,
     discipline_service: DisciplineServiceDep,
 ):
+    """
+    Возвращает дисциплину по её ID в КАИ.
+    *Берётся из базы данных Pocket KAI, а не сайта КАИ!*
+    """
     try:
         return await discipline_service.get_by_kai_id(kai_id)
     except EntityNotFoundError as error:
@@ -26,6 +37,7 @@ async def get_discipline_by_kai_id(
     '',
     response_model=DisciplineRead,
     dependencies=[Depends(check_service_token)],
+    include_in_schema=False,
 )
 async def create_discipline(
     new_discipline: DisciplineCreate,
