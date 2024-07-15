@@ -5,6 +5,7 @@ from typing import AsyncIterator
 
 from aiohttp import ClientError, ClientResponse, ClientSession
 
+from core.exceptions.common import RetryError
 from utils.kai_parser.base import KaiParserBase
 from utils.kai_parser.schemas.errors import KaiApiError
 from utils.kai_parser.schemas.group import ParsedGroup
@@ -46,29 +47,19 @@ class KaiParser(KaiParserBase):
                 timeout=self.timeout,
             ) as response:
                 if not response.ok:
-                    if current_retry < self.request_retries:
-                        yield await self._request(
-                            method,
-                            url,
-                            current_retry=current_retry + 1,
-                            **kwargs,
-                        )
-                    raise KaiApiError(
-                        f'URL: {url} | Status: {response.status} | Content: {await response.text()}',
-                    )
+                    raise RetryError
                 yield response
 
-        except (asyncio.TimeoutError, ClientError):
+        except (asyncio.TimeoutError, ClientError, RetryError):
             if current_retry < self.request_retries:
-                yield await self._request(
+                async with self._request(
                     method,
                     url,
                     current_retry=current_retry + 1,
                     **kwargs,
-                )
-            raise KaiApiError(
-                f'URL: {url} | Status: {response.status} | Content: {await response.text()}',
-            )
+                ) as response:
+                    yield response
+            raise KaiApiError(f'URL: {url} | Status: {response.status}')
 
     async def _awaitable_request(self, **kwargs):
         async with self._request(**kwargs) as response:

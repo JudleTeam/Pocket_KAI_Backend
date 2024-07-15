@@ -1,3 +1,7 @@
+from enum import Enum
+
+from uuid import UUID
+
 import datetime
 
 from pydantic import BaseModel
@@ -47,3 +51,29 @@ class UserAbout(BaseModel):
     dateDog: str | None
     kafId: int
     rabTheme: str | None
+
+
+class TaskType(str, Enum):
+    """Task type enum."""
+
+    GROUP_MEMBERS = 'group_members'
+    GROUP_DOCUMENTS = 'group_documents'
+
+
+class TaskStatus(str, Enum):
+    """Task status enum."""
+
+    IN_PROGRESS = 'in_progress'
+    COMPLETED = 'completed'
+    FAILED = 'failed'
+
+
+class TaskSchema(BaseModel):
+    id: UUID
+    created_at: datetime.datetime
+    type: TaskType
+    status: TaskStatus
+    login: str | None
+    group_name: str | None
+    errors: str | None
+    ended_at: datetime.datetime | None

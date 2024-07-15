@@ -25,5 +25,5 @@ class StudentEntity(BaseEntity):
     program_form: str | None
     status: str | None
 
-    group_id: UUID
+    group_id: UUID | None
     user_id: UUID | None

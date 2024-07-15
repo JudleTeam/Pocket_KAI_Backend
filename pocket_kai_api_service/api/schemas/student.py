@@ -1,11 +1,10 @@
 from uuid import UUID
-
 from datetime import date, datetime
 
-from pydantic import BaseModel
+from api.schemas.common import TunedModel
 
 
-class StudentRead(BaseModel):
+class StudentRead(TunedModel):
     id: UUID
     created_at: datetime
     kai_id: int | None
@@ -26,5 +25,18 @@ class StudentRead(BaseModel):
     program_form: str | None
     status: str | None
 
-    group_id: UUID
+    group_id: UUID | None
     user_id: UUID | None
+
+
+class GroupMember(TunedModel):
+    number: int
+    is_leader: bool
+    full_name: str
+    phone: str | None
+    email: str
+
+
+class AddGroupMembersRequest(TunedModel):
+    group_name: str
+    students: list[GroupMember]

@@ -39,7 +39,7 @@ async def update_lesson(
     lesson_service: LessonServiceDep,
 ):
     try:
-        return await lesson_service.update(lesson_id, lesson_update)
+        return await lesson_service.update_by_group_id(lesson_id, lesson_update)
     except EntityNotFoundError as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
     except BadRelatedEntityError:

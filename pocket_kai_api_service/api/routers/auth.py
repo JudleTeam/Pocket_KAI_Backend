@@ -1,8 +1,15 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Cookie, Form, HTTPException, Response
+from fastapi import APIRouter, Cookie, Form, HTTPException, Response, status
 
-from api.dependencies import AuthServiceDep
+from api.dependencies import AuthUseCaseDep
+from core.exceptions.auth import InvalidTokenError
+from core.exceptions.base import EntityNotFoundError
+from core.exceptions.kai_parser import (
+    BadKaiCredentialsError,
+    KaiParserApiError,
+    KaiParsingError,
+)
 
 
 router = APIRouter()
@@ -14,17 +21,29 @@ router = APIRouter()
 async def login_with_kai_credentials(
     login: Annotated[str, Form()],
     password: Annotated[str, Form()],
-    auth_service: AuthServiceDep,
+    auth_usecase: AuthUseCaseDep,
     response: Response,
 ):
     try:
-        access_token, refresh_token = await auth_service.login_by_kai(
+        access_token, refresh_token = await auth_usecase.login_by_kai(
             username=login,
             password=password,
         )
-    except Exception as e:
-        # TODO: better error handling
-        raise HTTPException(status_code=400, detail=str(e))
+    except BadKaiCredentialsError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Bad KAI credentials',
+        )
+    except KaiParsingError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail='Problems with parsing KAI',
+        )
+    except KaiParserApiError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail='KAI parser service unavailable',
+        )
 
     response.set_cookie(
         key='RefreshToken',
@@ -41,16 +60,15 @@ async def login_with_kai_credentials(
 )
 async def refresh_token_pair(
     refresh_token: Annotated[str, Cookie(alias='RefreshToken')],
-    auth_service: AuthServiceDep,
+    auth_usecase: AuthUseCaseDep,
     response: Response,
 ):
     try:
-        access_token, refresh_token = await auth_service.refresh_token_pair(
+        access_token, refresh_token = await auth_usecase.refresh_token_pair(
             refresh_token=refresh_token,
         )
-    except Exception as e:
-        # TODO: better error handling
-        raise HTTPException(status_code=400, detail=str(e))
+    except (EntityNotFoundError, InvalidTokenError):
+        raise HTTPException(status_code=400, detail='Invalid refresh token')
 
     response.set_cookie(
         key='RefreshToken',

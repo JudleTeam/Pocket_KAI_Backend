@@ -12,6 +12,7 @@ async def get_pocket_kai_api(
 ):
     async with ClientSession() as session:
         yield PocketKaiApi(
-            base_url=settings.pocket_kai_base_url,
+            base_url=settings.POCKET_KAI_BASE_URL,
             session=session,
+            service_token=settings.SERVICE_TOKEN,
         )

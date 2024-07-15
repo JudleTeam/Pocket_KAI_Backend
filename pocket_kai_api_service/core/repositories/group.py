@@ -27,6 +27,16 @@ class GroupRepositoryBase(GenericRepository[GroupEntity], ABC):
 class SAGroupRepository(GenericSARepository[GroupEntity], GroupRepositoryBase):
     model_cls = GroupModel
 
+    async def _convert_entity_to_update_dict(
+        self,
+        entity: GroupEntity,
+        **kwargs,
+    ) -> dict:
+        return entity.model_dump(
+            exclude={'id', 'profile', 'speciality', 'institute', 'department'},
+            exclude_unset=True,
+        )
+
     async def suggest_by_name(self, group_name: str, limit: int) -> list[GroupEntity]:
         stmt = (
             select(GroupModel)

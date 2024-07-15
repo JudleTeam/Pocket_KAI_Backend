@@ -45,7 +45,7 @@ class GroupModel(BaseModel):
 
     speciality: Mapped['SpecialityModel'] = relationship(lazy='selectin')
     profile: Mapped['ProfileModel'] = relationship(lazy='selectin')
-    departament: Mapped['DepartmentModel'] = relationship(lazy='selectin')
+    department: Mapped['DepartmentModel'] = relationship(lazy='selectin')
     institute: Mapped['InstituteModel'] = relationship(lazy='selectin')
 
     group_leader: Mapped['StudentModel'] = relationship(foreign_keys=[group_leader_id])

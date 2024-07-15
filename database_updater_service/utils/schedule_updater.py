@@ -138,19 +138,9 @@ class ScheduleUpdater:
         for lesson in lessons_to_delete:
             await self.pocket_kai_api.delete_group_lesson(lesson.id)
 
-        await self.pocket_kai_api.update_group(
+        await self.pocket_kai_api.patch_group(
             group_id=group.id,
-            kai_id=group.kai_id,
-            group_leader_id=group.group_leader_id,
-            pinned_text=group.pinned_text,
-            group_name=group.group_name,
-            is_verified=group.is_verified,
-            verified_at=group.verified_at,
-            parsed_at=group.parsed_at,
             schedule_parsed_at=parsed_group_schedule.parsed_at,
-            syllabus_url=group.syllabus_url,
-            educational_program_url=group.educational_program_url,
-            study_schedule_url=group.study_schedule_url,
         )
 
         return saved_new_lessons

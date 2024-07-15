@@ -6,6 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.repositories.department import SADepartmentRepository
 from core.repositories.discipline import SADisciplineRepository
 from core.repositories.group import SAGroupRepository
+from core.repositories.institute import SAInstituteRepository
+from core.repositories.profile import SAProfileRepository
+from core.repositories.speciality import SASpecialityRepository
 from core.repositories.student import SAStudentRepository
 from core.repositories.lesson import SALessonRepository
 from core.repositories.user import SAUserRepository
@@ -52,3 +55,15 @@ def get_student_repository(session: AsyncSessionDep):
 
 def get_refresh_token_repository(session: AsyncSessionDep):
     return SARefreshTokenRepository(session=session)
+
+
+def get_profile_repository(session: AsyncSessionDep):
+    return SAProfileRepository(session=session)
+
+
+def get_speciality_repository(session: AsyncSessionDep):
+    return SASpecialityRepository(session=session)
+
+
+def get_institute_repository(session: AsyncSessionDep):
+    return SAInstituteRepository(session=session)

@@ -30,20 +30,10 @@ class PocketKaiApiBase(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    async def update_group(
+    async def patch_group(
         self,
         group_id: UUID,
-        kai_id: int,
-        group_leader_id: UUID | None,
-        pinned_text: str | None,
-        group_name: str,
-        is_verified: bool,
-        verified_at: datetime.datetime | None,
-        parsed_at: datetime.datetime | None,
         schedule_parsed_at: datetime.datetime | None,
-        syllabus_url: str | None,
-        educational_program_url: str | None,
-        study_schedule_url: str | None,
     ):
         raise NotImplementedError
 

@@ -29,7 +29,12 @@ class GenericRepository[T: BaseEntity](ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def list(self, offset: int = 0, limit: int = 100, **filters) -> list[T]:
+    async def list(
+        self,
+        offset: int = 0,
+        limit: int = 100,
+        filters: dict = None,
+    ) -> list[T]:
         """
         Get a list of records
 

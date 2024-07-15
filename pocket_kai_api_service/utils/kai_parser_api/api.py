@@ -1,5 +1,10 @@
 from aiohttp import ClientSession
 
+from core.exceptions.kai_parser import (
+    BadKaiCredentialsError,
+    KaiParserApiError,
+    KaiParsingError,
+)
 from utils.kai_parser_api.schemas import UserAbout, UserInfo
 
 
@@ -29,10 +34,43 @@ class KaiParserApi:
             },
         ) as response:
             if response.status == 401:
-                raise  # TODO: добавить ошибку
+                raise BadKaiCredentialsError
+            if response.status == 503:
+                raise KaiParsingError(await response.text())
             if not response.ok:
-                raise  # TODO: добавить ошибку
+                raise KaiParserApiError(
+                    f'URL: {response.url} | Method: POST | Status code: {response.status} | Content: {await response.text()}',
+                )
 
             result = await response.json()
 
         return UserAbout(**result['user_about']), UserInfo(**result['user_info'])
+
+    async def get_tasks(
+        self,
+        limit: int,
+        offset: int,
+        group_name: str | None,
+        login: str | None,
+    ):
+        params = {
+            'limit': limit,
+            'offset': offset,
+        }
+        if group_name is not None:
+            params['group_name'] = group_name
+        if login is not None:
+            params['login'] = login
+
+        async with self.session.get(
+            url=self.base_url + '/task',
+            params=params,
+        ) as response:
+            if not response.ok:
+                raise KaiParserApiError(
+                    f'URL: {response.url} | Method: GET | Status code: {response.status} | Content: {await response.text()}',
+                )
+
+            result = await response.json()
+
+        return result

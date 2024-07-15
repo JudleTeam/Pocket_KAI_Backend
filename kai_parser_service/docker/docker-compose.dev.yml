@@ -8,5 +8,22 @@ services:
     ports:
       - "8002:8000"
     restart: unless-stopped
+    depends_on:
+      - kai_parser_postgres
     volumes:
       - ../:/app/
+
+  kai_parser_postgres:
+    container_name: kai_parser_postgres
+    image: postgres:16
+    env_file:
+      - ./kai_parser_service/.env
+    ports:
+      - "5433:5432"
+    restart: unless-stopped
+    volumes:
+      - kai_parser_postgres_data:/var/lib/postgresql/data
+
+
+volumes:
+  kai_parser_postgres_data:

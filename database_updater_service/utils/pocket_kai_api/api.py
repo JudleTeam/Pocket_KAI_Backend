@@ -63,38 +63,18 @@ class PocketKaiApi(PocketKaiApiBase):
         result = await self._json_request('post', url, json=data)
         return PocketKaiGroup(**result)
 
-    async def update_group(
+    async def patch_group(
         self,
         group_id: UUID,
-        kai_id: int,
-        group_leader_id: UUID | None,
-        pinned_text: str | None,
-        group_name: str,
-        is_verified: bool,
-        verified_at: datetime.datetime | None,
-        parsed_at: datetime.datetime | None,
         schedule_parsed_at: datetime.datetime | None,
-        syllabus_url: str | None,
-        educational_program_url: str | None,
-        study_schedule_url: str | None,
     ) -> PocketKaiGroup:
         url = self.base_pocket_kai_url + f'/group/by_id/{group_id}'
         data = {
-            'kai_id': kai_id,
-            'group_leader_id': str(group_leader_id) if group_leader_id else None,
-            'pinned_text': pinned_text,
-            'group_name': group_name,
-            'is_verified': is_verified,
-            'verified_at': verified_at.isoformat() if parsed_at else None,
-            'parsed_at': parsed_at.isoformat() if parsed_at else None,
             'schedule_parsed_at': schedule_parsed_at.replace(tzinfo=None).isoformat()
             if schedule_parsed_at
             else None,
-            'syllabus_url': syllabus_url,
-            'educational_program_url': educational_program_url,
-            'study_schedule_url': study_schedule_url,
         }
-        result = await self._json_request('put', url, json=data)
+        result = await self._json_request('PATCH', url, json=data)
         return PocketKaiGroup(**result)
 
     async def get_group_lessons_by_group_id(
@@ -278,7 +258,7 @@ class PocketKaiApi(PocketKaiApiBase):
         await self._json_request('delete', url)
 
     async def _get_groups(self, limit: int, offset: int) -> list[PocketKaiGroup]:
-        url = self.base_pocket_kai_url + '/group'
+        url = self.base_pocket_kai_url + '/group/'
         params = {
             'limit': limit,
             'offset': offset,

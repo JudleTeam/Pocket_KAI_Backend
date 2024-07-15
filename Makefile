@@ -6,3 +6,7 @@ down_dev:
 
 update_schedule:
 	docker exec -it database_updater python3 cli.py update_schedule
+
+migrate_all:
+	docker exec -it pocket_kai_fastapi alembic upgrade heads
+	docker exec -it kai_parser_api alembic upgrade heads

@@ -1,16 +1,11 @@
 import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
-
+from api.schemas.common import TunedModel
 from api.schemas.department import DepartmentRead
 
 
-class TeacherRead(BaseModel):
-    model_config = ConfigDict(
-        from_attributes=True,
-    )
-
+class TeacherRead(TunedModel):
     id: UUID
     created_at: datetime.datetime
     login: str
@@ -19,7 +14,7 @@ class TeacherRead(BaseModel):
     department: DepartmentRead | None
 
 
-class TeacherCreate(BaseModel):
+class TeacherCreate(TunedModel):
     login: str
     name: str
 

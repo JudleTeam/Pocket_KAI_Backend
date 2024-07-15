@@ -100,9 +100,7 @@ class SAStudentRepository(GenericSARepository[StudentEntity], StudentRepositoryB
             group_id=group_id,
             user_id=user_id,
         )
-
         await self._add(student)
-
         return await self._convert_db_to_entity(student)
 
     async def get_by_login(self, login: str) -> StudentEntity:

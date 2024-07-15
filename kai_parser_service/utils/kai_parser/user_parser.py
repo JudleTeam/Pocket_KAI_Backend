@@ -5,14 +5,11 @@ from typing import AsyncIterator
 from aiohttp import ClientError, ClientResponse, ClientSession
 from bs4 import BeautifulSoup
 
+from core.exceptions.common import RetryError
 from utils.kai_parser import helper
 from utils.kai_parser.schemas.errors import KaiApiError
 from utils.kai_parser.schemas.group import Documents
 from utils.kai_parser.schemas.user import GroupMember, UserAbout, UserInfo
-
-
-class RetryError(Exception):
-    pass
 
 
 class KaiUserParser:

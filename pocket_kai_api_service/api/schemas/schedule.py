@@ -1,27 +1,22 @@
 import datetime as dt
 
-from pydantic import BaseModel, ConfigDict
-
+from api.schemas.common import TunedModel
 from api.schemas.lesson import LessonRead
 from core.entities.common import WeekParity
 
 
-class ScheduleResponse(BaseModel):
+class ScheduleResponse(TunedModel):
     parsed_at: dt.datetime | None
     days: list['DayResponse']
 
 
-class DayResponse(BaseModel):
+class DayResponse(TunedModel):
     date: dt.date
     parity: WeekParity = WeekParity.any
     lessons: list[LessonRead]
 
 
-class Week(BaseModel):
-    model_config = ConfigDict(
-        from_attributes=True,
-    )
-
+class Week(TunedModel):
     monday: list[LessonRead]
     tuesday: list[LessonRead]
     wednesday: list[LessonRead]
@@ -31,7 +26,7 @@ class Week(BaseModel):
     sunday: list[LessonRead]
 
 
-class WeekDaysResponse(BaseModel):
+class WeekDaysResponse(TunedModel):
     parsed_at: dt.datetime | None
     week_parity: WeekParity
     week_days: Week

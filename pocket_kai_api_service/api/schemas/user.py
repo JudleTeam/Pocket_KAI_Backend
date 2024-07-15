@@ -1,11 +1,10 @@
 from datetime import datetime
-
 from uuid import UUID
 
-from pydantic import BaseModel
+from api.schemas.common import TunedModel
 
 
-class UserRead(BaseModel):
+class UserRead(TunedModel):
     id: UUID
     created_at: datetime
     telegram_id: int | None

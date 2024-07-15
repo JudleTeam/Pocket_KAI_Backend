@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from api.dependencies import StudentServiceDep, get_current_active_user
+from api.dependencies import StudentUseCaseDep, get_current_active_user
 from api.schemas.student import StudentRead
 from api.schemas.user import UserRead
 from core.entities.user import UserEntity
@@ -28,10 +28,10 @@ async def get_me(
 )
 async def get_current_student(
     current_user: Annotated[UserEntity, Depends(get_current_active_user)],
-    student_service: StudentServiceDep,
+    student_usecase: StudentUseCaseDep,
 ):
     try:
-        return await student_service.get_by_user_id(current_user.id)
+        return await student_usecase.get_by_user_id(current_user.id)
     except EntityNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

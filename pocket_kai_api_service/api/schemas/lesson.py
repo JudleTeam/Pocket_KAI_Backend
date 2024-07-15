@@ -3,19 +3,16 @@ from typing import Annotated
 from uuid import UUID
 import datetime as dt
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
+from api.schemas.common import TunedModel
 from api.schemas.department import DepartmentRead
 from api.schemas.discipline import DisciplineRead
 from api.schemas.teacher import TeacherRead
 from core.entities.common import LessonType, ParsedDatesStatus, WeekParity
 
 
-class LessonRead(BaseModel):
-    model_config = ConfigDict(
-        from_attributes=True,
-    )
-
+class LessonRead(TunedModel):
     id: UUID
     created_at: datetime.datetime
     group_id: UUID
@@ -36,7 +33,7 @@ class LessonRead(BaseModel):
     discipline: DisciplineRead
 
 
-class LessonCreate(BaseModel):
+class LessonCreate(TunedModel):
     number_of_day: Annotated[int, Field(ge=1, le=7)]
     original_dates: str | None
     parsed_parity: WeekParity
@@ -54,7 +51,7 @@ class LessonCreate(BaseModel):
     group_id: UUID
 
 
-class LessonUpdate(BaseModel):
+class LessonUpdate(TunedModel):
     number_of_day: Annotated[int, Field(ge=1, le=7)]
     original_dates: str | None
     parsed_parity: WeekParity

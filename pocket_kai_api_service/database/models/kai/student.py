@@ -1,5 +1,5 @@
 from datetime import date
-from typing import TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import ForeignKey
@@ -46,7 +46,7 @@ class StudentModel(BaseModel):
     program_form: Mapped[str | None] = mapped_column()
     status: Mapped[str | None] = mapped_column()
 
-    group_id: Mapped[UUID] = mapped_column(
+    group_id: Mapped[UUID | None] = mapped_column(
         ForeignKey('group.id', name='fk_student_group'),
     )
     user_id: Mapped[UUID | None] = mapped_column(
@@ -54,7 +54,7 @@ class StudentModel(BaseModel):
         unique=True,
     )
 
-    group: Mapped['GroupModel'] = relationship(
+    group: Mapped[Optional['GroupModel']] = relationship(
         foreign_keys=[group_id],
         back_populates='members',
     )

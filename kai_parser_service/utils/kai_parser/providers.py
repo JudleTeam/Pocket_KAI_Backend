@@ -15,8 +15,8 @@ async def get_kai_parser(
     async with ClientSession() as session:
         yield KaiParser(
             session=session,
-            timeout=settings.timeout_seconds,
-            request_retries=settings.request_retries,
+            timeout=settings.TIMEOUT_SECONDS,
+            request_retries=settings.REQUEST_RETRIES,
         )
 
 
@@ -26,5 +26,5 @@ async def get_kai_user_parser(
     async with ClientSession() as session:
         yield KaiUserParser(
             session=session,
-            max_retries=settings.request_retries,
+            max_retries=settings.REQUEST_RETRIES,
         )
