@@ -13,6 +13,9 @@ services:
     depends_on:
       - pocket_kai_postgres
       - kai_parser_api
+    networks:
+      pocket_kai_backend:
+      default:
 
   kai_parser_api:
     container_name: kai_parser_fastapi
@@ -20,9 +23,21 @@ services:
       dockerfile: docker/Dockerfile
       context: ./kai_parser_service
       target: production
-    ports:
-      - "8002:80"
+    networks:
+      kai_parser_backend:
+      default:
     restart: unless-stopped
+
+  kai_parser_postgres:
+    container_name: kai_parser_postgres
+    image: postgres:16
+    env_file:
+      - ./kai_parser_service/.env
+    restart: unless-stopped
+    networks:
+      kai_parser_backend:
+    volumes:
+      - kai_parser_postgres_data:/var/lib/postgresql/data
 
   database_updater_service:
     container_name: database_updater
@@ -35,6 +50,8 @@ services:
     depends_on:
       - pocket_kai_api
       - kai_parser_api
+    networks:
+      default:
 
   pocket_kai_postgres:
     image: postgres:16-alpine
@@ -44,6 +61,21 @@ services:
       - ./pocket_kai_api_service/.env
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    networks:
+      pocket_kai_backend:
+      default:
+
+
+networks:
+  kai_parser_backend:
+    driver: bridge
+  pocket_kai_backend:
+    driver: bridge
+  default:
+    driver: bridge
+
 
 volumes:
   postgres_data:
+
+  kai_parser_postgres_data:
