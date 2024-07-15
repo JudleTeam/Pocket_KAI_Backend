@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from uuid import UUID
 
 from sqlalchemy import select
 
@@ -21,7 +20,6 @@ class TeacherRepositoryBase(GenericRepository[TeacherEntity], ABC):
         self,
         login: str,
         name: str,
-        department_id: UUID,
     ) -> TeacherEntity:
         raise NotImplementedError
 
@@ -40,9 +38,7 @@ class SATeacherRepository(GenericSARepository[TeacherEntity], TeacherRepositoryB
         self,
         login: str,
         name: str,
-        department_id: UUID | None,
     ) -> TeacherEntity:
-        new_teacher = TeacherModel(login=login, name=name, department_id=department_id)
+        new_teacher = TeacherModel(login=login, name=name)
         await self._add(new_teacher)
-        await self._session.refresh(new_teacher, ['department'])
         return await self._convert_db_to_entity(new_teacher)

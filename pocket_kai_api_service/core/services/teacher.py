@@ -30,7 +30,6 @@ class TeacherService(TeacherServiceBase):
         new_teacher = await self.teacher_repository.create(
             login=teacher_create.login,
             name=teacher_create.name,
-            department_id=teacher_create.department_id,
         )
         await self.uow.commit()
         return new_teacher

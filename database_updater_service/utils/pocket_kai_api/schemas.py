@@ -39,8 +39,6 @@ class PocketKaiTeacher(BaseModel):
     login: str
     name: str
 
-    department: PocketKaiDepartment | None
-
 
 class PocketKaiDiscipline(BaseModel):
     id: UUID

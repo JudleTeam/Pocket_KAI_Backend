@@ -146,13 +146,11 @@ class PocketKaiApi(PocketKaiApiBase):
         self,
         login: str,
         name: str,
-        department_id: UUID | None,
     ) -> PocketKaiTeacher:
         url = self.base_pocket_kai_url + '/teacher'
         data = {
             'login': login,
             'name': name,
-            'department_id': str(department_id) if department_id else None,
         }
         result = await self._json_request('post', url, json=data)
         return PocketKaiTeacher(**result)
@@ -161,10 +159,9 @@ class PocketKaiApi(PocketKaiApiBase):
         self,
         login: str,
         name: str,
-        department_id: UUID,
     ) -> PocketKaiTeacher:
         try:
-            return await self.add_teacher(login, name, department_id)
+            return await self.add_teacher(login, name)
         except PocketKaiApiError as e:
             if e.status_code == 409:
                 return await self.get_teacher_by_login(login)

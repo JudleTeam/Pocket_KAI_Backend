@@ -32,7 +32,7 @@ async def get_all_groups(
     """
     Возвращает список всех групп с краткой либо полной (зависит от параметра `short`) информацией о них
     """
-    groups = await group_usecase.get_all(limit=limit, offset=offset)
+    groups = await group_usecase.get_all(limit=limit, offset=offset, is_short=is_short)
     if is_short:
         return [ShortGroupRead.model_validate(group) for group in groups]
     else:

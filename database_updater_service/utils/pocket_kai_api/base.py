@@ -69,7 +69,6 @@ class PocketKaiApiBase(Protocol):
         self,
         login: str,
         name: str,
-        department_id: UUID,
     ) -> PocketKaiTeacher:
         raise NotImplementedError
 
@@ -94,7 +93,6 @@ class PocketKaiApiBase(Protocol):
         self,
         login: str,
         name: str,
-        department_id: UUID,
     ) -> PocketKaiTeacher:
         raise NotImplementedError
 
