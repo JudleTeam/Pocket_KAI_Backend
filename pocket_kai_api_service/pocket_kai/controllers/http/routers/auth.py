@@ -31,6 +31,7 @@ router = APIRouter(route_class=DishkaRoute)
             'model': ErrorMessage,
         },
     },
+    name='Войти с помощью данных КАИ',
 )
 async def login_with_kai_credentials(
     login: Annotated[str, Form()],
@@ -100,6 +101,7 @@ async def login_with_kai_credentials(
             'model': ErrorMessage,
         },
     },
+    name='Обновить пару токенов',
 )
 async def refresh_token_pair(
     refresh_token: Annotated[str, Cookie(alias='RefreshToken')],

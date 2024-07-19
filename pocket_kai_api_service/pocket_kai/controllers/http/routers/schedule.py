@@ -28,10 +28,11 @@ router = APIRouter(route_class=DishkaRoute)
     response_model=WeekDaysResponse,
     responses={
         404: {
-            'description': 'Group not found',
+            'description': 'Группа не найдена',
             'model': ErrorMessage,
         },
     },
+    name='Получить расписание на неделю по номеру группы',
 )
 async def get_week_schedule_by_group_name(
     group_name: str,
@@ -60,10 +61,11 @@ async def get_week_schedule_by_group_name(
     response_model=WeekDaysResponse,
     responses={
         404: {
-            'description': 'Group not found',
+            'description': 'Группа не найдена',
             'model': ErrorMessage,
         },
     },
+    name='Получить расписание на неделю по ID группы',
 )
 async def get_week_schedule_by_group_id(
     group_id: UUID,
@@ -92,10 +94,11 @@ async def get_week_schedule_by_group_id(
     response_model=ScheduleResponse,
     responses={
         404: {
-            'description': 'Group not found',
+            'description': 'Группа не найдена',
             'model': ErrorMessage,
         },
     },
+    name='Получить расписание по дням по ID группы',
 )
 async def get_schedule_with_dates_by_group_id(
     date_from: Annotated[
@@ -131,10 +134,11 @@ async def get_schedule_with_dates_by_group_id(
     response_model=ScheduleResponse,
     responses={
         404: {
-            'description': 'Group not found',
+            'description': 'Группа не найдена',
             'model': ErrorMessage,
         },
     },
+    name='Получить расписание по дням по номеру группы',
 )
 async def get_schedule_with_dates_by_group_name(
     date_from: Annotated[

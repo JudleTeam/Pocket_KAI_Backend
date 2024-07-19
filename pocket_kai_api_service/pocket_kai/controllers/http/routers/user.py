@@ -19,6 +19,7 @@ router = APIRouter(route_class=DishkaRoute)
 @router.get(
     '/me',
     response_model=UserRead,
+    name='Получить текущего пользователя',
 )
 async def get_me(
     current_user: Annotated[UserEntity, Depends(get_current_active_user)],
@@ -38,6 +39,7 @@ async def get_me(
             'model': ErrorMessage,
         },
     },
+    name='Получить текущего студента',
 )
 async def get_current_student(
     current_user: Annotated[UserEntity, Depends(get_current_active_user)],

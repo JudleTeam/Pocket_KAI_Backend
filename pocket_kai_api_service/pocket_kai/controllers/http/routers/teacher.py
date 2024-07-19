@@ -28,6 +28,7 @@ router = APIRouter(route_class=DishkaRoute)
             'model': ErrorMessage,
         },
     },
+    name='Получить преподавателя по логину',
 )
 async def get_teacher_by_login(
     login: str,

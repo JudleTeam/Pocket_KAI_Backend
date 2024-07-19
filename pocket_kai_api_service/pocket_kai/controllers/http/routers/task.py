@@ -23,6 +23,7 @@ router = APIRouter(route_class=DishkaRoute)
             'model': ErrorMessage,
         },
     },
+    name='Получить фоновые задачи',
 )
 async def get_tasks(
     limit: int = 10,

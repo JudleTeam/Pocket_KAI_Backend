@@ -40,10 +40,11 @@ router = APIRouter(route_class=DishkaRoute)
     response_model=list[LessonRead],
     responses={
         404: {
-            'description': 'Group not found',
+            'description': 'Группа не найдена',
             'model': ErrorMessage,
         },
     },
+    name='Получить занятия группы по ID',
 )
 async def get_group_lessons_by_group_id(
     group_id: UUID,
@@ -65,6 +66,7 @@ async def get_group_lessons_by_group_id(
 @router.get(
     '/',
     response_model=Union[list[FullGroupRead], list[ShortGroupRead]],
+    name='Получить все группы',
 )
 async def get_all_groups(
     limit: Annotated[int, Query(ge=1, le=100)] = 30,
@@ -87,10 +89,11 @@ async def get_all_groups(
     response_model=FullGroupRead,
     responses={
         404: {
-            'description': 'Group not found',
+            'description': 'Группа не найдена',
             'model': ErrorMessage,
         },
     },
+    name='Получить группу по номеру',
 )
 async def get_group_by_name(
     group_name: str,
@@ -114,10 +117,11 @@ async def get_group_by_name(
     response_model=FullGroupRead,
     responses={
         404: {
-            'description': 'Group not found',
+            'description': 'Группа не найдена',
             'model': ErrorMessage,
         },
     },
+    name='Получить группу по ID',
 )
 async def get_group_by_id(
     group_id: UUID,
@@ -136,7 +140,11 @@ async def get_group_by_id(
         )
 
 
-@router.get('/suggest', response_model=list[ShortGroupRead])
+@router.get(
+    '/suggest',
+    response_model=list[ShortGroupRead],
+    name='Предложить группу по имени',
+)
 async def suggest_group_by_name(
     group_name: str,
     limit: Annotated[int, Query(ge=1, le=50)] = 20,
