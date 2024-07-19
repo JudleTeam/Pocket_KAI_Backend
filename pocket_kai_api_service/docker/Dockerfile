@@ -60,7 +60,7 @@ COPY . .
 
 EXPOSE 8000
 ENTRYPOINT /docker-entrypoint.sh "$0" $@
-CMD ["poetry", "run", "uvicorn", "main:app", "--host=0.0.0.0", "--port=8000", "--reload"]
+CMD ["poetry", "run", "uvicorn", "pocket_kai.main:app", "--host=0.0.0.0", "--port=8000", "--reload"]
 
 
 # 'production' stage uses the clean 'python-base' stage and copyies
