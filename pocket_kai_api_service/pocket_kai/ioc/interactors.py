@@ -22,12 +22,12 @@ from pocket_kai.application.interactors.kai_login import KaiLoginInteractor
 from pocket_kai.application.interactors.lesson import (
     CreateLessonInteractor,
     DeleteLessonInteractor,
+    ExtendedLessonConverter,
     GetLessonsByGroupIdInteractor,
     UpdateLessonInteractor,
 )
 from pocket_kai.application.interactors.refresh_token import RefreshTokenPairInteractor
 from pocket_kai.application.interactors.schedule import (
-    ExtendedLessonConverter,
     GetDatesScheduleByGroupIdInteractor,
     GetDatesScheduleByGroupNameInteractor,
     GetWeekScheduleByGroupIdInteractor,

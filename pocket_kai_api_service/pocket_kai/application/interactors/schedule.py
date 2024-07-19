@@ -8,20 +8,17 @@ from pocket_kai.application.dto.schedule import (
     WeekDTO,
     WeekDaysDTO,
 )
-from pocket_kai.application.interactors.lesson import ExtendedLessonConverter
 from pocket_kai.application.interfaces.entities.group import GroupReader
 from pocket_kai.application.interfaces.entities.lesson import LessonReader
 from pocket_kai.domain.common import WeekParity
 from pocket_kai.domain.entitites.group import GroupEntity
-from pocket_kai.domain.entitites.lesson import LessonEntity
 from pocket_kai.domain.exceptions.group import GroupNotFoundError
 
 
 async def week_schedule(
-    group_lessons: list[LessonEntity],
+    group_lessons: list[LessonExtendedDTO],
     group: GroupEntity,
     week_parity: WeekParity,
-    lesson_extended_converter: ExtendedLessonConverter,
 ) -> WeekDaysDTO:
     lessons_by_week_days = {
         'monday': [],
@@ -46,7 +43,7 @@ async def week_schedule(
     for lesson in group_lessons:
         day = day_mapping.get(lesson.number_of_day)
         if day:
-            lessons_by_week_days[day].append(await lesson_extended_converter(lesson))
+            lessons_by_week_days[day].append(lesson)
 
     return WeekDaysDTO(
         parsed_at=group.schedule_parsed_at,
@@ -68,18 +65,16 @@ class GetWeekScheduleByGroupNameInteractor:
         self,
         lesson_gateway: LessonReader,
         group_gateway: GroupReader,
-        lesson_extended_converter: ExtendedLessonConverter,
     ):
         self._lesson_gateway = lesson_gateway
         self._group_gateway = group_gateway
-        self._lesson_extended_converter = lesson_extended_converter
 
     async def __call__(self, group_name: str, week_parity: WeekParity) -> WeekDaysDTO:
         group = await self._group_gateway.get_by_name(group_name)
         if group is None:
             raise GroupNotFoundError
 
-        group_lessons = await self._lesson_gateway.get_by_group_id(
+        group_lessons = await self._lesson_gateway.get_by_group_id_extended(
             group_id=group.id,
             week_parity=week_parity,
         )
@@ -88,7 +83,6 @@ class GetWeekScheduleByGroupNameInteractor:
             group_lessons=group_lessons,
             group=group,
             week_parity=week_parity,
-            lesson_extended_converter=self._lesson_extended_converter,
         )
 
 
@@ -97,18 +91,16 @@ class GetWeekScheduleByGroupIdInteractor:
         self,
         lesson_gateway: LessonReader,
         group_gateway: GroupReader,
-        lesson_extended_converter: ExtendedLessonConverter,
     ):
         self._lesson_gateway = lesson_gateway
         self._group_gateway = group_gateway
-        self._lesson_extended_converter = lesson_extended_converter
 
     async def __call__(self, group_id: str, week_parity: WeekParity) -> WeekDaysDTO:
         group = await self._group_gateway.get_by_id(group_id)
         if group is None:
             raise GroupNotFoundError
 
-        group_lessons = await self._lesson_gateway.get_by_group_id(
+        group_lessons = await self._lesson_gateway.get_by_group_id_extended(
             group_id=group.id,
             week_parity=week_parity,
         )
@@ -117,7 +109,6 @@ class GetWeekScheduleByGroupIdInteractor:
             group_lessons=group_lessons,
             group=group,
             week_parity=week_parity,
-            lesson_extended_converter=self._lesson_extended_converter,
         )
 
 
@@ -168,11 +159,9 @@ class GetDatesScheduleByGroupNameInteractor:
         self,
         lesson_gateway: LessonReader,
         group_gateway: GroupReader,
-        lesson_extended_converter: ExtendedLessonConverter,
     ):
         self._lesson_gateway = lesson_gateway
         self._group_gateway = group_gateway
-        self._lesson_extended_converter = lesson_extended_converter
 
     async def __call__(
         self,
@@ -202,11 +191,9 @@ class GetDatesScheduleByGroupIdInteractor:
         self,
         lesson_gateway: LessonReader,
         group_gateway: GroupReader,
-        lesson_extended_converter: ExtendedLessonConverter,
     ):
         self._lesson_gateway = lesson_gateway
         self._group_gateway = group_gateway
-        self._lesson_extended_converter = lesson_extended_converter
 
     async def __call__(
         self,
