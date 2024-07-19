@@ -78,4 +78,4 @@ COPY . /app
 WORKDIR /app
 
 ENTRYPOINT /docker-entrypoint.sh "$0" $@
-CMD [ "gunicorn", "--worker-class uvicorn.workers.UvicornWorker", "--config /gunicorn_conf.py", "main:app"]
+CMD [ "gunicorn", "--worker-class uvicorn.workers.UvicornWorker", "--config /gunicorn_conf.py", "pocket_kai.main:app"]
