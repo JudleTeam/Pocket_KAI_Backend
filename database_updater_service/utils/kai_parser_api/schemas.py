@@ -26,7 +26,7 @@ class ParsedLesson(BaseModel):
     day_number: int
     start_time: datetime.time | None
     end_time: datetime.time | None
-    dates: str
+    dates: str | None
     parsed_dates: list[datetime.date] | None
     parsed_dates_status: ParsedDatesStatus
     parsed_parity: WeekParity

@@ -94,8 +94,8 @@ def compare_lessons(parsed: ParsedLesson, pocket: PocketKaiLesson) -> dict[str, 
 
     for diff in differences:
         differences[diff] = {
-            'before': differences[diff][0],
-            'after': differences[diff][1],
+            'before': differences[diff][1],
+            'after': differences[diff][0],
         }
 
     return differences

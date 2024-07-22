@@ -20,7 +20,7 @@ class ParsedLesson(BaseModel):
 
     day_number: int
     start_time: datetime.time | None
-    dates: str
+    dates: str | None
 
     discipline_name: str
     discipline_type: str
@@ -35,22 +35,35 @@ class ParsedLesson(BaseModel):
     teacher_name: str
     teacher_login: str | None
 
-    @field_validator('audience_number', 'building_number')
+    @field_validator('dates', 'audience_number', 'building_number')
     @classmethod
-    def remove_dashes(cls, value: str) -> str:
-        return value.replace('-', '')
+    def remove_dashes(cls, value: str) -> str | None:
+        if value and value == len(value) * '-':
+            return None
+        return value
 
-    @field_validator('audience_number', 'building_number', 'department_name')
+    @field_validator('dates', 'audience_number', 'building_number', 'department_name')
     @classmethod
     def empty_to_none(cls, value: Any) -> Any | None:
         if not value:
+            return None
+        if isinstance(value, str) and value.strip() == '':
+            return None
+        return value
+
+    @field_validator('dates', 'audience_number', 'building_number')
+    @classmethod
+    def zero_to_none(cls, value: Any) -> Any | None:
+        if not value or value == 0 or (isinstance(value, str) and value.strip() == '0'):
             return None
         return value
 
     @field_validator('teacher_name')
     @classmethod
-    def title_str(cls, value: str) -> str:
-        return value.title()
+    def title_str(cls, value: str | None) -> str | None:
+        if isinstance(value, str):
+            return value.title()
+        return value
 
     @field_validator('start_time', mode='before')
     @classmethod
@@ -65,7 +78,7 @@ class ParsedLesson(BaseModel):
         if not self.department_id and not self.department_name:
             self.department_id = self.department_name = None
 
-        if self.teacher_name.lower() == 'преподаватель кафедры':
+        if self.teacher_name.strip().lower() == 'преподаватель кафедры':
             self.teacher_login = None
 
         if self.parsed_lesson_type == LessonType.military_training:
@@ -76,11 +89,15 @@ class ParsedLesson(BaseModel):
     @computed_field
     @cached_property
     def parsed_parity(self) -> WeekParity:
+        if not self.dates:
+            return WeekParity.any
+
         dates = self.dates.replace('ё', 'e').lower()
 
         # 'нея' - typo.
         if 'нечет' in dates or 'неч' in dates or 'нея' in dates:
             odd = True
+            # Заменяем именно 'нечет' и именно до того как проверить на 'чет'
             dates = dates.replace('нечет', '')
         else:
             odd = False
@@ -122,6 +139,9 @@ class ParsedLesson(BaseModel):
     @computed_field
     @cached_property
     def parsed_dates(self) -> list[datetime.date] | None:
+        if not self.dates:
+            return None
+
         sanitized_dates = self.sanitize_dates(self.dates)
         dates_str_list = sanitized_dates.split()
 
@@ -173,6 +193,9 @@ class ParsedLesson(BaseModel):
             'eжн',
             'еженедельно',
         )
+        if not self.dates:
+            return ParsedDatesStatus.GOOD
+
         processed_dates = self.dates.strip().replace('ё', 'е').replace(' ', '').lower()
         if processed_dates in good_parity_variants:
             return ParsedDatesStatus.GOOD

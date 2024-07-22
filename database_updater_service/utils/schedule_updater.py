@@ -79,12 +79,12 @@ class ScheduleUpdater:
         logging.info(
             f'Group: {group.group_name} | {len(unchanged_lessons)} unchanged lessons |  {len(changed_lessons)} changed lessons | {len(lessons_to_add)} new lessons | {len(lessons_to_delete)} deleted lessons',
         )
-        if changed_lessons:
-            logging.info(f'Changed lessons: {changed_lessons}')
 
         for changed_lesson in changed_lessons:
             old_lesson = changed_lesson['old']
             new_lesson = changed_lesson['new']
+
+            logging.info(changed_lesson['differences'])
 
             if 'teacher_login' in changed_lesson['differences']:
                 teacher = await self.get_or_add_teacher(
@@ -102,6 +102,7 @@ class ScheduleUpdater:
 
             await self.pocket_kai_api.update_group_lesson(
                 lesson_id=old_lesson.id,
+                created_at=old_lesson.created_at,
                 number_of_day=new_lesson.day_number,
                 original_dates=new_lesson.dates,
                 parsed_parity=new_lesson.parsed_parity,

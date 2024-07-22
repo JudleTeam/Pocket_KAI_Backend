@@ -121,6 +121,7 @@ class PocketKaiApiBase(Protocol):
     async def update_group_lesson(
         self,
         lesson_id: UUID,
+        created_at: datetime.datetime,
         number_of_day: int,
         original_dates: str | None,
         parsed_parity: WeekParity,

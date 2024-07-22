@@ -211,6 +211,7 @@ class PocketKaiApi(PocketKaiApiBase):
     async def update_group_lesson(
         self,
         lesson_id: UUID,
+        created_at: datetime,
         number_of_day: int,
         original_dates: str | None,
         parsed_parity: WeekParity,
@@ -229,6 +230,7 @@ class PocketKaiApi(PocketKaiApiBase):
     ) -> PocketKaiLesson:
         url = self.base_pocket_kai_url + f'/lesson/{lesson_id}'
         data = {
+            'created_at': created_at.isoformat(),
             'number_of_day': number_of_day,
             'original_dates': original_dates,
             'parsed_parity': parsed_parity,
