@@ -118,7 +118,7 @@ class GetGroupByIdInteractor:
 
     async def __call__(self, group_id: str) -> GroupEntity:
         return await self._group_extended_dto_converter(
-            await self._group_gateway.get_by_id(group_id=group_id),
+            await self._group_gateway.get_by_id(id=group_id),
         )
 
 
