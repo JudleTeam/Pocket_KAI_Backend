@@ -16,12 +16,12 @@ async def update_schedule():
         logging.info('Creating schedule updater...')
         kai_parser_api = KaiParserApi(
             session=session_1,
-            base_kai_parser_url=settings.kai_parser_url,
+            base_kai_parser_url=settings.KAI_PARSER_URL,
         )
         pocket_kai_api = PocketKaiApi(
             session=session_2,
-            base_pocket_kai_url=settings.pocket_kai_api_url,
-            service_token=settings.service_token,
+            base_pocket_kai_url=settings.POCKET_KAI_API_URL,
+            service_token=settings.SERVICE_TOKEN,
         )
 
         schedule_updater = ScheduleUpdater(kai_parser_api, pocket_kai_api)
@@ -31,10 +31,11 @@ async def update_schedule():
 
 async def start_schedulers():
     async with AsyncScheduler() as scheduler:
-        await scheduler.add_schedule(
-            update_schedule,
-            CronTrigger(hour=3, minute=0, timezone=settings.timezone),
-        )
+        if settings.UPDATE_SCHEDULE:
+            await scheduler.add_schedule(
+                update_schedule,
+                CronTrigger(hour=3, minute=0, timezone=settings.TIMEZONE),
+            )
 
         await scheduler.run_until_stopped()
 

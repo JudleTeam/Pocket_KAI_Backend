@@ -8,12 +8,14 @@ class Settings(BaseSettings):
         env_file_encoding='UTF-8',
     )
 
-    pocket_kai_api_url: str
-    service_token: str
+    POCKET_KAI_API_URL: str
+    SERVICE_TOKEN: str
 
-    kai_parser_url: str
+    KAI_PARSER_URL: str
 
-    timezone: str = 'Europe/Moscow'
+    UPDATE_SCHEDULE: bool = False
+
+    TIMEZONE: str = 'Europe/Moscow'
 
 
 settings = Settings()
