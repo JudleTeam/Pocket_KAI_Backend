@@ -87,7 +87,7 @@ async def login_with_kai_credentials(
         key='RefreshToken',
         value=refresh_token,
         httponly=True,
-        secure=False,  # TODO: make it secure in production
+        secure=True,
         path='/auth/refresh_token',
         samesite='none',  # TODO: check if it feets for production
     )
@@ -124,7 +124,7 @@ async def refresh_token_pair(
         key='RefreshToken',
         value=refresh_token,
         httponly=True,
-        secure=False,  # TODO: make it secure in production
+        secure=True,
         path='/auth/refresh_token',
         samesite='none',  # TODO: check if it feets for production
     )
