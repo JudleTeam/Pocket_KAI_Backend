@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from bs4 import BeautifulSoup
 
+from utils.kai_parser.schemas.exam import YearDataForGroup
 from utils.kai_parser.schemas.group import Documents
 from utils.kai_parser.schemas.user import GroupMember, UserInfo
 from utils.kai_parser.utils import parse_phone_number
@@ -112,4 +113,31 @@ def parse_documents(soup: BeautifulSoup) -> Documents:
         syllabus=syllabus_raw['href'] if syllabus_raw else None,
         educational_program=edu_program_raw['href'] if edu_program_raw else None,
         study_schedule=study_schedule_raw['href'] if study_schedule_raw else None,
+    )
+
+
+def get_year_data_from_group_name(group_name: str) -> YearDataForGroup:
+    current_date = datetime.now(timezone.utc).date()
+
+    # С августа считаем уже новый учебный год, может начать появляться новое расписание
+    if current_date.month < 8:
+        academic_year = f'{current_date.year - 1}-{current_date.year}'
+    else:
+        academic_year = f'{current_date.year}-{current_date.year + 1}'
+
+    # Февраль-июль - второй семестр, всё остальное - первый
+    if 2 <= current_date.month <= 7:
+        academic_year_half = 2
+    else:
+        academic_year_half = 1
+
+    semester = None
+    if len(group_name) == 4 and (group_name[0] in '1234568'):
+        group_year = int(group_name[1])  # Вторая цифра
+        semester = (group_year - 1) * 2 + academic_year_half
+
+    return YearDataForGroup(
+        academic_year=academic_year,
+        academic_year_half=academic_year_half,
+        semester=semester,
     )

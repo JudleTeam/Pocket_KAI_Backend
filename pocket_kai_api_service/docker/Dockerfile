@@ -60,7 +60,7 @@ COPY . .
 
 EXPOSE 8000
 ENTRYPOINT /docker-entrypoint.sh "$0" $@
-CMD ["poetry", "run", "uvicorn", "pocket_kai.main:app", "--host=0.0.0.0", "--port=8000", "--reload"]
+CMD ["poetry", "run", "uvicorn", "--factory", "pocket_kai.main:get_production_fastapi_app", "--host=0.0.0.0", "--port=8000", "--reload"]
 
 
 # 'production' stage uses the clean 'python-base' stage and copyies
@@ -78,4 +78,4 @@ COPY . /app
 WORKDIR /app
 
 ENTRYPOINT /docker-entrypoint.sh "$0" $@
-CMD [ "gunicorn", "--worker-class uvicorn.workers.UvicornWorker", "--config /gunicorn_conf.py", "pocket_kai.main:app"]
+CMD [ "gunicorn", "--worker-class uvicorn.workers.UvicornWorker", "--config /gunicorn_conf.py", "pocket_kai.main:get_production_fastapi_app()"]

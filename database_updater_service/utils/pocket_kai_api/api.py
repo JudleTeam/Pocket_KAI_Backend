@@ -10,6 +10,7 @@ from utils.pocket_kai_api.base import PocketKaiApiBase, PocketKaiApiError
 from utils.pocket_kai_api.schemas import (
     PocketKaiDepartment,
     PocketKaiDiscipline,
+    PocketKaiExam,
     PocketKaiGroup,
     PocketKaiLesson,
     PocketKaiTeacher,
@@ -67,11 +68,15 @@ class PocketKaiApi(PocketKaiApiBase):
         self,
         group_id: UUID,
         schedule_parsed_at: datetime.datetime | None,
+        exams_parsed_at: datetime.datetime | None,
     ) -> PocketKaiGroup:
         url = self.base_pocket_kai_url + f'/group/by_id/{group_id}'
         data = {
             'schedule_parsed_at': schedule_parsed_at.replace(tzinfo=None).isoformat()
             if schedule_parsed_at
+            else None,
+            'exams_parsed_at': exams_parsed_at.replace(tzinfo=None).isoformat()
+            if exams_parsed_at
             else None,
         }
         result = await self._json_request('PATCH', url, json=data)
@@ -275,3 +280,87 @@ class PocketKaiApi(PocketKaiApiBase):
             offset += limit
 
         return all_groups
+
+    async def get_exams_by_group_id(
+        self,
+        group_id: UUID,
+        academic_year: str | None,
+        academic_year_half: int | None,
+    ) -> list[PocketKaiExam]:
+        url = self.base_pocket_kai_url + f'/group/by_id/{group_id}/exam'
+        params = dict()
+        if academic_year:
+            params['academic_year'] = academic_year
+        if academic_year_half:
+            params['academic_year_half'] = academic_year_half
+        result = await self._json_request('get', url, params=params)
+        return [PocketKaiExam(**exam_dict) for exam_dict in result]
+
+    async def add_exam(
+        self,
+        original_date: str,
+        time: datetime.time,
+        audience_number: str | None,
+        building_number: str | None,
+        parsed_date: datetime.date | None,
+        academic_year: str,
+        academic_year_half: int,
+        semester: int | None,
+        discipline_id: UUID,
+        teacher_id: UUID | None,
+        group_id: UUID,
+    ) -> PocketKaiExam:
+        url = self.base_pocket_kai_url + '/exam'
+        data = {
+            'original_date': original_date,
+            'time': time.isoformat(),
+            'audience_number': audience_number,
+            'building_number': building_number,
+            'parsed_date': parsed_date.isoformat() if parsed_date else None,
+            'academic_year': academic_year,
+            'academic_year_half': academic_year_half,
+            'semester': semester,
+            'discipline_id': str(discipline_id),
+            'teacher_id': str(teacher_id) if teacher_id else None,
+            'group_id': str(group_id),
+        }
+        result = await self._json_request('post', url, json=data)
+        return PocketKaiExam(**result)
+
+    async def update_exam(
+        self,
+        exam_id: UUID,
+        created_at: datetime.datetime,
+        original_date: str,
+        time: datetime.time,
+        audience_number: str | None,
+        building_number: str | None,
+        parsed_date: datetime.date | None,
+        academic_year: str,
+        academic_year_half: int,
+        semester: int | None,
+        discipline_id: UUID,
+        teacher_id: UUID | None,
+        group_id: UUID,
+    ) -> PocketKaiExam:
+        url = self.base_pocket_kai_url + f'/exam/{exam_id}'
+        data = {
+            'created_at': created_at.isoformat(),
+            'original_date': original_date,
+            'time': time.isoformat(),
+            'audience_number': audience_number,
+            'building_number': building_number,
+            'parsed_date': parsed_date.isoformat() if parsed_date else None,
+            'academic_year': academic_year,
+            'academic_year_half': academic_year_half,
+            'semester': semester,
+            'discipline_id': str(discipline_id),
+            'teacher_id': str(teacher_id) if teacher_id else None,
+            'group_id': str(group_id),
+        }
+        result = await self._json_request('put', url, json=data)
+        return PocketKaiExam(**result)
+
+    async def delete_exam(self, exam_id: UUID) -> None:
+        url = self.base_pocket_kai_url + f'/exam/{exam_id}'
+        await self._json_request('delete', url)

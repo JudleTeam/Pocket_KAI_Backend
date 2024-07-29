@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).parent
 
 class PostgresSettings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file='../.env',
+        env_file='.env',
         env_file_encoding='utf-8',
         frozen=True,
         extra='allow',
@@ -37,7 +37,7 @@ class PostgresSettings(BaseSettings):
 
 class JWTSettings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file='../.env',
+        env_file='.env',
         env_file_encoding='utf-8',
         frozen=True,
         extra='allow',
@@ -62,7 +62,7 @@ class JWTSettings(BaseSettings):
 
 class KaiParserSettings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file='../.env',
+        env_file='.env',
         env_file_encoding='utf-8',
         frozen=True,
         extra='allow',

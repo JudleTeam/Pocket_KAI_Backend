@@ -8,6 +8,7 @@ from pocket_kai.application.interfaces.entities.student import (
 from pocket_kai.application.interfaces.unit_of_work import UnitOfWork
 from pocket_kai.domain.entitites.student import StudentEntity
 from pocket_kai.domain.exceptions.group import GroupNotFoundError
+from pocket_kai.domain.exceptions.student import StudentNotFoundError
 
 
 class AddGroupMembersInteractor:
@@ -97,5 +98,8 @@ class GetStudentByUserIdInteractor:
     ):
         self._student_gateway = student_gateway
 
-    async def __call__(self, user_id: str) -> StudentEntity | None:
-        return await self._student_gateway.get_by_user_id(user_id=user_id)
+    async def __call__(self, user_id: str) -> StudentEntity:
+        student = await self._student_gateway.get_by_user_id(user_id=user_id)
+        if student is None:
+            raise StudentNotFoundError
+        return student

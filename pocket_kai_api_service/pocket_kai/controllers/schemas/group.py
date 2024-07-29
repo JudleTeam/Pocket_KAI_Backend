@@ -20,6 +20,7 @@ class ShortGroupRead(BaseModel):
     parsed_at: datetime | None
 
     schedule_parsed_at: datetime | None
+    exams_parsed_at: datetime | None
 
 
 class FullGroupRead(BaseModel):
@@ -36,6 +37,7 @@ class FullGroupRead(BaseModel):
     parsed_at: datetime | None
 
     schedule_parsed_at: datetime | None
+    exams_parsed_at: datetime | None
 
     syllabus_url: str | None
     educational_program_url: str | None
@@ -63,6 +65,7 @@ class GroupUpdate(BaseModel):
     parsed_at: datetime | None
 
     schedule_parsed_at: datetime | None
+    exams_parsed_at: datetime | None
 
     speciality_id: UUID | None
     profile_id: UUID | None
@@ -85,6 +88,7 @@ class GroupPatch(BaseModel):
     parsed_at: datetime | None = None
 
     schedule_parsed_at: datetime | None = None
+    exams_parsed_at: datetime | None = None
 
     speciality_id: UUID | None = None
     profile_id: UUID | None = None

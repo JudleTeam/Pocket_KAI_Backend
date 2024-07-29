@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     KAI_PARSER_URL: str
 
     UPDATE_SCHEDULE: bool = False
+    UPDATE_EXAMS: bool = False
 
     TIMEZONE: str = 'Europe/Moscow'
 

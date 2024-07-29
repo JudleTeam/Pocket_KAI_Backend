@@ -7,6 +7,7 @@ from .speciality import SpecialityModel
 from .student import StudentModel
 from .teacher import TeacherModel
 from .discipline import DisciplineModel
+from .exam import ExamModel
 
 
 __all__ = [
@@ -19,4 +20,5 @@ __all__ = [
     'StudentModel',
     'TeacherModel',
     'DisciplineModel',
+    'ExamModel',
 ]

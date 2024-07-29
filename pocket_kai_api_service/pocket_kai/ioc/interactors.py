@@ -8,6 +8,11 @@ from pocket_kai.application.interactors.discipline import (
     CreateDisciplineInteractor,
     GetDisciplineByKaiIdInteractor,
 )
+from pocket_kai.application.interactors.exam import (
+    CreateExamInteractor,
+    GetExamsByGroupIdInteractor,
+    UpdateExamInteractor,
+)
 from pocket_kai.application.interactors.group import (
     CreateGroupInteractor,
     GetAllGroupsInteractor,
@@ -86,5 +91,8 @@ class InteractorsProvider(Provider):
         GetStudentByUserIdInteractor,
         GetUserByAccessTokenInteractor,
         GetTasksInteractor,
+        CreateExamInteractor,
+        GetExamsByGroupIdInteractor,
+        UpdateExamInteractor,
         scope=Scope.REQUEST,
     )

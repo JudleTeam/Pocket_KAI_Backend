@@ -1,9 +1,11 @@
+import dataclasses
+
 import datetime
 
 from pydantic import BaseModel
 
 from utils.common import LessonType, ParsedDatesStatus, WeekParity
-from utils.pocket_kai_api.schemas import PocketKaiGroup, PocketKaiLesson
+from utils.pocket_kai_api.schemas import PocketKaiGroup
 
 
 class ParsedGroup(BaseModel):
@@ -45,23 +47,28 @@ class ParsedLesson(BaseModel):
     teacher_name: str
     teacher_login: str | None
 
-    def __eq__(self, other):
-        if isinstance(other, PocketKaiLesson):
-            return (
-                self.day_number == other.number_of_day
-                and self.start_time == other.start_time
-                and self.end_time == other.end_time
-                and self.dates == other.original_dates
-                and self.parsed_dates == other.parsed_dates
-                and self.parsed_dates_status == other.parsed_dates_status
-                and self.parsed_parity == other.parsed_parity
-                and self.parsed_lesson_type == other.parsed_lesson_type
-                and self.discipline_type == other.original_lesson_type
-                and self.discipline_number == other.discipline.kai_id
-                and self.audience_number == other.audience_number
-                and self.building_number == other.building_number
-                and self.department_id == other.department.kai_id
-                and self.teacher_login == other.teacher.login
-                if other.teacher
-                else None
-            )
+
+@dataclasses.dataclass
+class YearDataForGroup:
+    academic_year: str
+    academic_year_half: int
+    semester: int
+
+
+class ParsedExam(BaseModel):
+    date: str
+    parsed_date: datetime.date | None
+    time: datetime.time
+    discipline_name: str
+    discipline_number: int
+    audience_number: str | None
+    building_number: str | None
+    teacher_name: str
+    teacher_login: str | None
+
+
+class ParsedGroupExams(BaseModel):
+    parsed_at: datetime.datetime
+    year_data: YearDataForGroup
+    group_kai_id: int
+    parsed_exams: list[ParsedExam]

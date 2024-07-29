@@ -28,6 +28,7 @@ class GroupPatchDTO(BaseModel):
     parsed_at: datetime | None = None
 
     schedule_parsed_at: datetime | None = None
+    exams_parsed_at: datetime | None = None
 
     speciality_id: str | None = None
     profile_id: str | None = None

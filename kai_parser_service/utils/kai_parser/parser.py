@@ -7,7 +7,9 @@ from aiohttp import ClientError, ClientResponse, ClientSession
 
 from core.exceptions.common import RetryError
 from utils.kai_parser.base import KaiParserBase
+from utils.kai_parser.helper import get_year_data_from_group_name
 from utils.kai_parser.schemas.errors import KaiApiError
+from utils.kai_parser.schemas.exam import ParsedExam, ParsedGroupExams
 from utils.kai_parser.schemas.group import ParsedGroup
 from utils.kai_parser.schemas.lesson import ParsedLesson
 from utils.kai_parser.schemas.schedule import ParsedGroupSchedule
@@ -130,4 +132,44 @@ class KaiParser(KaiParserBase):
             parsed_at=parsed_at,
             group_kai_id=group_kai_id,
             lessons=lessons,
+        )
+
+    async def parse_group_exams(self, group_kai_id: int, group_name: str):
+        params = {
+            'p_p_id': 'pubStudentSchedule_WAR_publicStudentSchedule10',
+            'p_p_lifecycle': 2,
+            'p_p_resource_id': 'examSchedule',
+        }
+        data = {
+            'groupId': group_kai_id,
+        }
+
+        parsed_at = datetime.now(timezone.utc)
+        async with self._request(
+            'POST',
+            self.schedule_url,
+            params=params,
+            data=data,
+        ) as response:
+            exams_from_kai = await response.json(content_type='text/html')
+
+        parsed_exams = [
+            ParsedExam(
+                date=exam.get('examDate'),
+                time=exam.get('examTime'),
+                discipline_name=exam.get('disciplName'),
+                discipline_number=exam.get('disciplNum'),
+                audience_number=exam.get('audNum'),
+                building_number=exam.get('buildNum'),
+                teacher_name=exam.get('prepodName'),
+                teacher_login=exam.get('prepodLogin'),
+            )
+            for exam in exams_from_kai
+        ]
+
+        return ParsedGroupExams(
+            parsed_at=parsed_at,
+            group_kai_id=group_kai_id,
+            parsed_exams=parsed_exams,
+            year_data=get_year_data_from_group_name(group_name),
         )

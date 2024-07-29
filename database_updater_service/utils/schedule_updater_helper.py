@@ -47,43 +47,52 @@ def compare_lessons(parsed: ParsedLesson, pocket: PocketKaiLesson) -> dict[str, 
 
     if parsed.day_number != pocket.number_of_day:
         differences['day_number'] = (parsed.day_number, pocket.number_of_day)
+
     if parsed.start_time != pocket.start_time:
         differences['start_time'] = (parsed.start_time, pocket.start_time)
+
     if parsed.end_time != pocket.end_time:
         differences['end_time'] = (parsed.end_time, pocket.end_time)
+
     if parsed.dates != pocket.original_dates:
         differences['dates'] = (parsed.dates, pocket.original_dates)
+
     if parsed.parsed_dates != pocket.parsed_dates:
         differences['parsed_dates'] = (parsed.parsed_dates, pocket.parsed_dates)
+
     if parsed.parsed_parity != pocket.parsed_parity:
         differences['parsed_parity'] = (parsed.parsed_parity, pocket.parsed_parity)
+
     if parsed.parsed_dates_status != pocket.parsed_dates_status:
         differences['parsed_dates_status'] = (
             parsed.parsed_dates_status,
             pocket.parsed_dates_status,
         )
+
     if parsed.parsed_lesson_type != pocket.parsed_lesson_type:
         differences['parsed_lesson_type'] = (
             parsed.parsed_lesson_type,
             pocket.parsed_lesson_type,
         )
+
     if parsed.audience_number != pocket.audience_number:
         differences['audience_number'] = (
             parsed.audience_number,
             pocket.audience_number,
         )
+
     if parsed.building_number != pocket.building_number:
         differences['building_number'] = (
             parsed.building_number,
             pocket.building_number,
         )
-    # if parsed.teacher_name != (pocket.teacher.name if pocket.teacher else None):
-    #     differences['teacher_name'] = (parsed.teacher_name, (pocket.teacher.name if pocket.teacher else None))
+
     if parsed.teacher_login != (pocket.teacher.login if pocket.teacher else None):
         differences['teacher_login'] = (
             parsed.teacher_login,
-            (pocket.teacher.name if pocket.teacher else None),
+            (pocket.teacher.login if pocket.teacher else None),
         )
+
     if parsed.department_id != (
         pocket.department.kai_id if pocket.department else None
     ):
@@ -113,12 +122,19 @@ def find_changes_in_lessons(
     unchanged_lessons = list()
     changed_lessons = list()
 
+    # Проходимся по новым и старым занятиям,
+    # если есть четкое соответствие между старым и новым занятием,
+    # то удаляем их из обоих словарей
     for key in list(parsed_lessons_dict.keys()):
         if key in pocket_lessons_dict:
             parsed_lessons_dict.pop(key)
             pocket_lesson = pocket_lessons_dict.pop(key)
             unchanged_lessons.append(pocket_lesson)
 
+    # На этом моменте в словарях у нас только занятия, которым не нашлось чёткое соответствие
+    # Для них нужно:
+    # 1. Сопоставить новое занятие со старым
+    # 2. Определить что именно изменилось
     for parsed_lesson_key, parsed_lesson in parsed_lessons_dict.copy().items():
         possible_pairs = list()
         for (

@@ -8,6 +8,7 @@ from utils.kai_parser_api.schemas import WeekParity
 from utils.pocket_kai_api.schemas import (
     PocketKaiDepartment,
     PocketKaiDiscipline,
+    PocketKaiExam,
     PocketKaiGroup,
     PocketKaiLesson,
     PocketKaiTeacher,
@@ -34,6 +35,7 @@ class PocketKaiApiBase(Protocol):
         self,
         group_id: UUID,
         schedule_parsed_at: datetime.datetime | None,
+        exams_parsed_at: datetime.datetime | None,
     ):
         raise NotImplementedError
 
@@ -142,4 +144,53 @@ class PocketKaiApiBase(Protocol):
 
     @abstractmethod
     async def delete_group_lesson(self, lesson_id: UUID) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_exams_by_group_id(
+        self,
+        group_id: UUID,
+        academic_year: str | None,
+        academic_year_half: int | None,
+    ) -> list[PocketKaiExam]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def add_exam(
+        self,
+        original_date: str,
+        time: datetime.time,
+        audience_number: str | None,
+        building_number: str | None,
+        parsed_date: datetime.date | None,
+        academic_year: str,
+        academic_year_half: int,
+        semester: int | None,
+        discipline_id: UUID,
+        teacher_id: UUID | None,
+        group_id: UUID,
+    ) -> PocketKaiExam:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def update_exam(
+        self,
+        exam_id: UUID,
+        created_at: datetime.datetime,
+        original_date: str,
+        time: datetime.time,
+        audience_number: str | None,
+        building_number: str | None,
+        parsed_date: datetime.date | None,
+        academic_year: str,
+        academic_year_half: int,
+        semester: int | None,
+        discipline_id: UUID,
+        teacher_id: UUID | None,
+        group_id: UUID,
+    ) -> PocketKaiExam:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def delete_exam(self, exam_id: UUID) -> None:
         raise NotImplementedError

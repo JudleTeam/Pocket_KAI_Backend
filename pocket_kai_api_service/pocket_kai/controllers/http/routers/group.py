@@ -7,6 +7,7 @@ from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from pocket_kai.application.dto.group import NewGroupDTO
+from pocket_kai.application.interactors.exam import GetExamsByGroupIdInteractor
 from pocket_kai.application.interactors.group import (
     CreateGroupInteractor,
     GetAllGroupsInteractor,
@@ -19,6 +20,7 @@ from pocket_kai.application.interactors.group import (
 from pocket_kai.application.interactors.lesson import GetLessonsByGroupIdInteractor
 from pocket_kai.controllers.http.dependencies import check_service_token
 from pocket_kai.controllers.schemas.common import ErrorMessage
+from pocket_kai.controllers.schemas.exam import ExamRead
 from pocket_kai.controllers.schemas.group import (
     FullGroupRead,
     GroupCreate,
@@ -56,6 +58,39 @@ async def get_group_lessons_by_group_id(
     """
     try:
         return await interactor(group_id=group_id)
+    except GroupNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Group not found',
+        )
+
+
+@router.get(
+    '/by_id/{group_id}/exam',
+    response_model=list[ExamRead],
+    responses={
+        404: {
+            'description': 'Группа не найдена',
+            'model': ErrorMessage,
+        },
+    },
+)
+async def get_group_exams_by_group_id(
+    group_id: UUID,
+    academic_year: str = None,
+    academic_year_half: int = None,
+    *,
+    interactor: FromDishka[GetExamsByGroupIdInteractor],
+):
+    """
+    Возвращает список всех экзаменов для группы по её `ID` (ID из PocketKAI).
+    """
+    try:
+        return await interactor(
+            group_id=str(group_id),
+            academic_year=academic_year,
+            academic_year_half=academic_year_half,
+        )
     except GroupNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

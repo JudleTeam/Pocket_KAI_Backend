@@ -13,6 +13,7 @@ from pocket_kai.controllers.http.routers import (
     group,
     schedule,
     task,
+    exam,
 )
 
 
@@ -29,3 +30,4 @@ router.include_router(lesson.router, prefix='/lesson')
 router.include_router(group.router, prefix='/group', tags=['Группы'])
 router.include_router(schedule.router, prefix='/group', tags=['Расписание групп'])
 router.include_router(task.router, prefix='/task', tags=['Фоновые задачи'])
+router.include_router(exam.router, prefix='/exam', tags=['Экзамены'])

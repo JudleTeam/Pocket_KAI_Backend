@@ -25,7 +25,7 @@ class GroupModel(BaseModel):
     kai_id: Mapped[int] = mapped_column(sa.BigInteger, unique=True)
     group_leader_id: Mapped[UUID | None] = mapped_column(ForeignKey('student.id'))
     pinned_text: Mapped[str | None] = mapped_column()
-    group_name: Mapped[str] = mapped_column(unique=True)
+    group_name: Mapped[str] = mapped_column()
 
     is_verified: Mapped[bool] = mapped_column(default=False)
     verified_at: Mapped[datetime | None] = mapped_column(default=None)
@@ -33,6 +33,7 @@ class GroupModel(BaseModel):
     parsed_at: Mapped[datetime | None] = mapped_column(default=None)
 
     schedule_parsed_at: Mapped[datetime | None] = mapped_column(default=None)
+    exams_parsed_at: Mapped[datetime | None] = mapped_column(default=None)
 
     syllabus_url: Mapped[str | None] = mapped_column()
     educational_program_url: Mapped[str | None] = mapped_column()
@@ -43,10 +44,10 @@ class GroupModel(BaseModel):
     institute_id: Mapped[UUID | None] = mapped_column(ForeignKey('institute.id'))
     department_id: Mapped[UUID | None] = mapped_column(ForeignKey('department.id'))
 
-    speciality: Mapped['SpecialityModel'] = relationship(lazy='selectin')
-    profile: Mapped['ProfileModel'] = relationship(lazy='selectin')
-    department: Mapped['DepartmentModel'] = relationship(lazy='selectin')
-    institute: Mapped['InstituteModel'] = relationship(lazy='selectin')
+    speciality: Mapped['SpecialityModel'] = relationship()
+    profile: Mapped['ProfileModel'] = relationship()
+    department: Mapped['DepartmentModel'] = relationship()
+    institute: Mapped['InstituteModel'] = relationship()
 
     group_leader: Mapped['StudentModel'] = relationship(foreign_keys=[group_leader_id])
     members: Mapped[list['StudentModel']] = relationship(

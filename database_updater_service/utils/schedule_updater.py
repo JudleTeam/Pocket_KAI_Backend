@@ -2,7 +2,7 @@ import asyncio
 import logging
 from collections import defaultdict
 
-from utils.helper import find_changes_in_lessons
+from utils.schedule_updater_helper import find_changes_in_lessons
 from utils.kai_parser_api.base import KaiParserApiBase
 from utils.kai_parser_api.schemas import ParsedGroup, ParsedLesson
 from utils.pocket_kai_api.base import PocketKaiApiBase
@@ -90,7 +90,6 @@ class ScheduleUpdater:
                 teacher = await self.get_or_add_teacher(
                     teachers,
                     new_lesson,
-                    old_lesson.department,
                 )
             else:
                 teacher = old_lesson.teacher
@@ -123,7 +122,7 @@ class ScheduleUpdater:
         saved_new_lessons = list()
         for lesson in lessons_to_add:
             department = await self.get_or_add_department(departments, lesson)
-            teacher = await self.get_or_add_teacher(teachers, lesson, department)
+            teacher = await self.get_or_add_teacher(teachers, lesson)
             discipline = await self.get_or_add_discipline(disciplines, lesson)
 
             saved_new_lessons.append(
@@ -226,7 +225,6 @@ class ScheduleUpdater:
         self,
         teachers: dict,
         lesson: ParsedLesson,
-        department,
     ) -> PocketKaiTeacher | None:
         if not lesson.teacher_login:
             return None
@@ -239,7 +237,6 @@ class ScheduleUpdater:
                 teacher = await self.pocket_kai_api.create_or_get_teacher_by_login(
                     login=lesson.teacher_login,
                     name=lesson.teacher_name,
-                    department_id=department.id if department else None,
                 )
                 logging.info('New teacher added')
             teachers[teacher.login] = teacher

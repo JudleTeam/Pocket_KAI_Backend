@@ -16,6 +16,7 @@ class GroupEntity:
     parsed_at: dt.datetime | None
 
     schedule_parsed_at: dt.datetime | None
+    exams_parsed_at: dt.datetime | None
 
     syllabus_url: str | None
     educational_program_url: str | None

@@ -1,7 +1,11 @@
 from aiohttp import ClientSession
 
 from utils.kai_parser_api.base import KaiParserApiBase
-from utils.kai_parser_api.schemas import ParsedGroup, ParsedGroupSchedule
+from utils.kai_parser_api.schemas import (
+    ParsedGroup,
+    ParsedGroupExams,
+    ParsedGroupSchedule,
+)
 
 
 class KaiParserApi(KaiParserApiBase):
@@ -25,3 +29,15 @@ class KaiParserApi(KaiParserApiBase):
             params={'group_kai_id': group_kai_id},
         )
         return ParsedGroupSchedule.model_validate(json_response)
+
+    async def get_group_exams(
+        self,
+        group_kai_id: int,
+        group_name: str,
+    ) -> ParsedGroupExams:
+        json_response = await self._json_request(
+            'GET',
+            url=self.base_kai_parser_url + '/exam',
+            params={'group_kai_id': group_kai_id, 'group_name': group_name},
+        )
+        return ParsedGroupExams.model_validate(json_response)

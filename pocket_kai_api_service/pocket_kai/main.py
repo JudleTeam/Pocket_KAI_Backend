@@ -1,5 +1,5 @@
 from dishka import make_async_container
-from dishka.integrations.fastapi import setup_dishka
+from dishka.integrations import fastapi as dishka_fastapi
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
@@ -56,27 +56,38 @@ container = make_async_container(
     context={Settings: settings},
 )
 
-app = FastAPI(
-    title='Pocket KAI API',
-    description=description,
-    openapi_tags=tags_metadata,
-    default_response_class=ORJSONResponse,
-)
-
-setup_dishka(container=container, app=app)
-
 origins = [
     'http://localhost',
     'http://localhost:8080',
     'http://localhost:3000',
 ]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=['*'],
-    allow_headers=['*'],
-)
 
-app.include_router(router)
+def get_fastapi_app(lifespan=None) -> FastAPI:
+    app = FastAPI(
+        title='Pocket KAI API',
+        description=description,
+        openapi_tags=tags_metadata,
+        default_response_class=ORJSONResponse,
+        lifespan=lifespan,
+    )
+
+    app.include_router(router)
+
+    return app
+
+
+def get_production_fastapi_app() -> FastAPI:
+    fastapi_app = get_fastapi_app()
+
+    fastapi_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=['*'],
+        allow_headers=['*'],
+    )
+
+    dishka_fastapi.setup_dishka(container=container, app=fastapi_app)
+
+    return fastapi_app

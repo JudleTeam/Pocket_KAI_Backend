@@ -20,6 +20,7 @@ class PocketKaiGroup(BaseModel):
     parsed_at: datetime | None
 
     schedule_parsed_at: datetime | None
+    exams_parsed_at: datetime | None
 
     syllabus_url: str | None
     educational_program_url: str | None
@@ -65,4 +66,21 @@ class PocketKaiLesson(BaseModel):
 
     teacher: PocketKaiTeacher | None
     department: PocketKaiDepartment | None
+    discipline: PocketKaiDiscipline
+
+
+class PocketKaiExam(BaseModel):
+    id: UUID
+    created_at: datetime
+    original_date: str
+    time: time
+    audience_number: str | None
+    building_number: str | None
+    parsed_date: date | None
+    academic_year: str
+    academic_year_half: int
+    semester: int | None
+    group_id: UUID
+
+    teacher: PocketKaiTeacher | None
     discipline: PocketKaiDiscipline

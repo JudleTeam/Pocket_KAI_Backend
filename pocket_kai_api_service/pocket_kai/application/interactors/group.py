@@ -149,6 +149,7 @@ class CreateGroupInteractor:
             verified_at=None,
             parsed_at=None,
             schedule_parsed_at=None,
+            exams_parsed_at=None,
             syllabus_url=None,
             educational_program_url=None,
             study_schedule_url=None,

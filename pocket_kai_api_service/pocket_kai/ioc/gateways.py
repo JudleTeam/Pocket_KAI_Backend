@@ -10,6 +10,13 @@ from pocket_kai.application.interfaces.entities.discipline import (
     DisciplineReader,
     DisciplineSaver,
 )
+from pocket_kai.application.interfaces.entities.exam import (
+    ExamDeleter,
+    ExamGatewayProtocol,
+    ExamReader,
+    ExamSaver,
+    ExamUpdater,
+)
 from pocket_kai.application.interfaces.entities.group import (
     GroupGatewayProtocol,
     GroupReader,
@@ -59,6 +66,7 @@ from pocket_kai.application.interfaces.entities.teacher import (
 from pocket_kai.application.interfaces.entities.user import UserReader, UserSaver
 from pocket_kai.infrastructure.gateways.department import DepartmentGateway
 from pocket_kai.infrastructure.gateways.discipline import DisciplineGateway
+from pocket_kai.infrastructure.gateways.exam import ExamGateway
 from pocket_kai.infrastructure.gateways.group import GroupGateway
 from pocket_kai.infrastructure.gateways.institute import InstituteGateway
 from pocket_kai.infrastructure.gateways.lesson import LessonGateway
@@ -154,4 +162,15 @@ class GatewaysProvider(Provider):
     task_gateway = provide(
         TaskGateway,
         provides=AnyOf[TaskReader],
+    )
+
+    exam_gateway = provide(
+        ExamGateway,
+        provides=AnyOf[
+            ExamSaver,
+            ExamReader,
+            ExamUpdater,
+            ExamDeleter,
+            ExamGatewayProtocol,
+        ],
     )
