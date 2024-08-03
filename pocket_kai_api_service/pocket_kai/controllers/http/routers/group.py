@@ -7,6 +7,9 @@ from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from pocket_kai.application.dto.group import NewGroupDTO
+from pocket_kai.application.interactors.discipline import (
+    GetGroupDisciplinesWithTeachersInteractor,
+)
 from pocket_kai.application.interactors.exam import GetExamsByGroupIdInteractor
 from pocket_kai.application.interactors.group import (
     CreateGroupInteractor,
@@ -20,6 +23,7 @@ from pocket_kai.application.interactors.group import (
 from pocket_kai.application.interactors.lesson import GetLessonsByGroupIdInteractor
 from pocket_kai.controllers.http.dependencies import check_service_token
 from pocket_kai.controllers.schemas.common import ErrorMessage
+from pocket_kai.controllers.schemas.discipline import DisciplineWithTypesResponse
 from pocket_kai.controllers.schemas.exam import ExamRead
 from pocket_kai.controllers.schemas.group import (
     FullGroupRead,
@@ -58,6 +62,33 @@ async def get_group_lessons_by_group_id(
     """
     try:
         return await interactor(group_id=group_id)
+    except GroupNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Group not found',
+        )
+
+
+@router.get(
+    '/by_id/{group_id}/discipline',
+    response_model=list[DisciplineWithTypesResponse],
+    responses={
+        404: {
+            'description': 'Группа не найдена',
+            'model': ErrorMessage,
+        },
+    },
+)
+async def get_group_disciplines_with_teachers_by_group_id(
+    group_id: UUID,
+    *,
+    interactor: FromDishka[GetGroupDisciplinesWithTeachersInteractor],
+):
+    """
+    Возвращает список всех дисциплин вместе с типами и преподавателями для группы по её `ID` (ID из PocketKAI).
+    """
+    try:
+        return await interactor(group_id=str(group_id))
     except GroupNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
