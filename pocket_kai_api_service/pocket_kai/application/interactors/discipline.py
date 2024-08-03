@@ -1,12 +1,17 @@
-from pocket_kai.application.dto.discipline import NewDisciplineDTO
+from pocket_kai.application.dto.discipline import (
+    DisciplineWithTypesDTO,
+    NewDisciplineDTO,
+)
 from pocket_kai.application.interfaces.common import DateTimeManager, UUIDGenerator
 from pocket_kai.application.interfaces.entities.discipline import (
     DisciplineReader,
     DisciplineSaver,
 )
+from pocket_kai.application.interfaces.entities.group import GroupReader
 from pocket_kai.application.interfaces.unit_of_work import UnitOfWork
 from pocket_kai.domain.entitites.discipline import DisciplineEntity
 from pocket_kai.domain.exceptions.discipline import DisciplineNotFoundError
+from pocket_kai.domain.exceptions.group import GroupNotFoundError
 
 
 class GetDisciplineByKaiIdInteractor:
@@ -18,6 +23,25 @@ class GetDisciplineByKaiIdInteractor:
         if discipline is None:
             raise DisciplineNotFoundError
         return discipline
+
+
+class GetGroupDisciplinesWithTeachersInteractor:
+    def __init__(
+        self,
+        discipline_gateway: DisciplineReader,
+        group_gateway: GroupReader,
+    ):
+        self._discipline_gateway = discipline_gateway
+        self._group_gateway = group_gateway
+
+    async def __call__(self, group_id: str) -> list[DisciplineWithTypesDTO]:
+        group = await self._group_gateway.get_by_id(id=group_id)
+        if group is None:
+            raise GroupNotFoundError
+
+        return await self._discipline_gateway.get_by_group_id_with_teachers(
+            group_id=group_id,
+        )
 
 
 class CreateDisciplineInteractor:
