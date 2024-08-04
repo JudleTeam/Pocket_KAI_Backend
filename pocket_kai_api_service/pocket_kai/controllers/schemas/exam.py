@@ -16,16 +16,19 @@ class ExamBase(BaseModel):
     academic_year: str
     academic_year_half: int
     semester: int | None
-    discipline_id: UUID
-    teacher_id: UUID | None
     group_id: UUID
 
 
-class ExamCreate(ExamBase): ...
+class ExamCreate(ExamBase):
+    discipline_id: UUID
+    teacher_id: UUID | None
 
 
 class ExamUpdate(ExamBase):
     created_at: dt.datetime
+
+    discipline_id: UUID
+    teacher_id: UUID | None
 
 
 class ExamRead(ExamBase):
