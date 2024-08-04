@@ -42,6 +42,7 @@ from pocket_kai.application.interactors.schedule import (
 from pocket_kai.application.interactors.service_token import CheckServiceTokenInteractor
 from pocket_kai.application.interactors.student import (
     AddGroupMembersInteractor,
+    GetGroupMembersByUserIdInteractor,
     GetStudentByUserIdInteractor,
 )
 from pocket_kai.application.interactors.task import GetTasksInteractor
@@ -96,5 +97,6 @@ class InteractorsProvider(Provider):
         GetExamsByGroupIdInteractor,
         UpdateExamInteractor,
         GetGroupDisciplinesWithTeachersInteractor,
+        GetGroupMembersByUserIdInteractor,
         scope=Scope.REQUEST,
     )

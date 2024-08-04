@@ -66,7 +66,9 @@ class StudentGateway(StudentReader, StudentSaver, StudentUpdater):
         return [
             self._db_to_entity(student_record)
             for student_record in await self._session.scalars(
-                select(StudentModel).where(StudentModel.group_id == group_id),
+                select(StudentModel)
+                .where(StudentModel.group_id == group_id)
+                .order_by(StudentModel.position),
             )
         ]
 

@@ -28,6 +28,15 @@ class StudentRead(BaseModel):
     user_id: UUID | None
 
 
+class GroupMemberRead(BaseModel):
+    id: UUID
+    kai_id: int | None
+    position: int | None
+    is_leader: bool
+    full_name: str
+    email: str
+
+
 class GroupMember(BaseModel):
     number: int
     is_leader: bool

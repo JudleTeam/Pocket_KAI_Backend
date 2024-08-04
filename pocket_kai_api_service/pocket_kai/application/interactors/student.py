@@ -103,3 +103,20 @@ class GetStudentByUserIdInteractor:
         if student is None:
             raise StudentNotFoundError
         return student
+
+
+class GetGroupMembersByUserIdInteractor:
+    def __init__(
+        self,
+        student_gateway: StudentReader,
+    ):
+        self._student_gateway = student_gateway
+
+    async def __call__(self, user_id: str) -> list[StudentEntity]:
+        student = await self._student_gateway.get_by_user_id(user_id=user_id)
+        if student is None:
+            raise StudentNotFoundError
+
+        return await self._student_gateway.get_by_group_id(
+            group_id=student.group_id,
+        )
