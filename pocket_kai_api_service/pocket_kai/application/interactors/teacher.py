@@ -23,6 +23,17 @@ class GetTeacherByLoginInteractor:
         return teacher
 
 
+class SuggestTeachersByNameInteractor:
+    def __init__(
+        self,
+        teacher_gateway: TeacherReader,
+    ):
+        self._teacher_gateway = teacher_gateway
+
+    async def __call__(self, name: str, limit: int) -> list[TeacherEntity]:
+        return await self._teacher_gateway.suggest_by_name(name=name, limit=limit)
+
+
 class CreateTeacherInteractor:
     def __init__(
         self,

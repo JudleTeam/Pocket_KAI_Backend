@@ -49,6 +49,7 @@ from pocket_kai.application.interactors.task import GetTasksInteractor
 from pocket_kai.application.interactors.teacher import (
     CreateTeacherInteractor,
     GetTeacherByLoginInteractor,
+    SuggestTeachersByNameInteractor,
 )
 from pocket_kai.application.interactors.user import GetUserByAccessTokenInteractor
 
@@ -98,5 +99,6 @@ class InteractorsProvider(Provider):
         UpdateExamInteractor,
         GetGroupDisciplinesWithTeachersInteractor,
         GetGroupMembersByUserIdInteractor,
+        SuggestTeachersByNameInteractor,
         scope=Scope.REQUEST,
     )

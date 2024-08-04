@@ -1,4 +1,5 @@
 from dishka import AnyOf, Provider, Scope, provide
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from pocket_kai.application.interfaces.entities.department import (
     DepartmentGatewayProtocol,
@@ -64,6 +65,7 @@ from pocket_kai.application.interfaces.entities.teacher import (
     TeacherSaver,
 )
 from pocket_kai.application.interfaces.entities.user import UserReader, UserSaver
+from pocket_kai.config import Settings
 from pocket_kai.infrastructure.gateways.department import DepartmentGateway
 from pocket_kai.infrastructure.gateways.discipline import DisciplineGateway
 from pocket_kai.infrastructure.gateways.exam import ExamGateway
@@ -83,10 +85,16 @@ from pocket_kai.infrastructure.gateways.user import UserGateway
 class GatewaysProvider(Provider):
     scope = Scope.REQUEST
 
-    teacher_gateway = provide(
-        TeacherGateway,
-        provides=AnyOf[TeacherReader, TeacherSaver],
-    )
+    @provide
+    def get_teacher_gateway(
+        self,
+        session: AsyncSession,
+        config: Settings,
+    ) -> AnyOf[TeacherReader, TeacherSaver]:
+        return TeacherGateway(
+            session=session,
+            search_similarity_threshold=config.common.TEACHER_SEARCH_SIMILARITY,
+        )
 
     service_token_gateway = provide(
         ServiceTokenGateway,

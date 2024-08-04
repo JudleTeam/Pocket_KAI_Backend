@@ -71,10 +71,22 @@ class KaiParserSettings(BaseSettings):
     KAI_PARSER_API_BASE_URL: str
 
 
+class CommonSettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file='.env',
+        env_file_encoding='utf-8',
+        frozen=True,
+        extra='allow',
+    )
+
+    TEACHER_SEARCH_SIMILARITY: float = 0.15
+
+
 class Settings(BaseModel):
     postgres: PostgresSettings = PostgresSettings()
     jwt: JWTSettings = JWTSettings()
     kai_parser: KaiParserSettings = KaiParserSettings()
+    common: CommonSettings = CommonSettings()
 
 
 @lru_cache

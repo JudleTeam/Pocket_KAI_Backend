@@ -24,3 +24,7 @@ class TeacherReader(Protocol):
     @abstractmethod
     async def get_by_login(self, login: str) -> TeacherEntity | None:
         raise NotImplementedError
+
+    @abstractmethod
+    async def suggest_by_name(self, name: str, limit: int) -> list[TeacherEntity]:
+        raise NotImplementedError
