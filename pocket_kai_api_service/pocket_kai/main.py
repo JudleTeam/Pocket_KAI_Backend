@@ -11,26 +11,26 @@ from pocket_kai.ioc.main import providers
 
 tags_metadata = [
     {
-        'name': 'Группы',
+        'name': 'Groups',
         'description': (
             'Эндпоинты для работы с группы. '
-            'Также есть отдельные категории связанные с группами: `Groups schedule` и `Groups lessons`'
+            'Также есть отдельные категории связанные с группами: `Groups schedule`'
         ),
     },
     {
-        'name': 'Расписание групп',
+        'name': 'Groups schedule',
         'description': 'Эндпоинты для работы с расписанием групп',
     },
     {
-        'name': 'Преподаватели',
+        'name': 'Teachers',
         'description': 'Эндпоинты для работы с преподавателями',
     },
     {
-        'name': 'Кафедры',
+        'name': 'Departments',
         'description': 'Эндпоинты для работы с кафедрами',
     },
     {
-        'name': 'Дисциплины',
+        'name': 'Disciplines',
         'description': 'Эндпоинты для работы с дисциплинами',
     },
 ]

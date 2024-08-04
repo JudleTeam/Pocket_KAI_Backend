@@ -14,7 +14,6 @@ router = APIRouter()
 @router.get(
     '/week_parity',
     response_model=WeekParityResponse,
-    name='Получить четность недели по дате',
 )
 async def get_week_parity(
     date: Annotated[

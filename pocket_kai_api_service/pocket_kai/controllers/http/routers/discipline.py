@@ -28,7 +28,6 @@ router = APIRouter(route_class=DishkaRoute)
             'model': ErrorMessage,
         },
     },
-    name='Получить дисциплину по ID из КАИ',
 )
 async def get_discipline_by_kai_id(
     kai_id: int,
