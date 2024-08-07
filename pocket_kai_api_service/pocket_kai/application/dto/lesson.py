@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from pocket_kai.domain.common import LessonType, ParsedDatesStatus, WeekParity
 from pocket_kai.domain.entitites.department import DepartmentEntity
 from pocket_kai.domain.entitites.discipline import DisciplineEntity
+from pocket_kai.domain.entitites.group import GroupEntity
 from pocket_kai.domain.entitites.lesson import LessonEntity
 from pocket_kai.domain.entitites.teacher import TeacherEntity
 
@@ -55,3 +56,10 @@ class LessonExtendedDTO(LessonEntity):
     teacher: TeacherEntity | None
     department: DepartmentEntity | None
     discipline: DisciplineEntity
+
+
+@dataclasses.dataclass(slots=True)
+class TeacherLessonExtendedDTO(LessonEntity):
+    department: DepartmentEntity | None
+    discipline: DisciplineEntity
+    groups: list[GroupEntity]

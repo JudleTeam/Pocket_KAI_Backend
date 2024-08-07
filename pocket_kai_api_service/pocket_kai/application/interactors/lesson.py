@@ -1,6 +1,10 @@
 from dataclasses import asdict
 
-from pocket_kai.application.dto.lesson import LessonExtendedDTO, NewLessonDTO
+from pocket_kai.application.dto.lesson import (
+    LessonExtendedDTO,
+    NewLessonDTO,
+    TeacherLessonExtendedDTO,
+)
 from pocket_kai.application.interfaces.common import DateTimeManager, UUIDGenerator
 from pocket_kai.application.interfaces.entities.department import DepartmentReader
 from pocket_kai.application.interfaces.entities.discipline import DisciplineReader
@@ -15,6 +19,7 @@ from pocket_kai.application.interfaces.unit_of_work import UnitOfWork
 from pocket_kai.domain.common import WeekParity
 from pocket_kai.domain.entitites.lesson import LessonEntity
 from pocket_kai.domain.exceptions.lesson import LessonNotFoundError
+from pocket_kai.domain.exceptions.teacher import TeacherNotFoundError
 
 
 class ExtendedLessonConverter:
@@ -135,3 +140,27 @@ class UpdateLessonInteractor:
         await self._lesson_gateway.update(lesson_entity)
         await self._uow.commit()
         return await self._lesson_extended_converter(lesson_entity)
+
+
+class GetLessonsByTeacherIdInteractor:
+    def __init__(
+        self,
+        lesson_gateway: LessonReader,
+        teacher_gateway: TeacherReader,
+    ):
+        self._lesson_gateway = lesson_gateway
+        self._teacher_gateway = teacher_gateway
+
+    async def __call__(
+        self,
+        teacher_id: str,
+        week_parity: WeekParity,
+    ) -> list[TeacherLessonExtendedDTO]:
+        teacher = await self._teacher_gateway.get_by_id(id=teacher_id)
+        if teacher is None:
+            raise TeacherNotFoundError
+
+        return await self._lesson_gateway.get_by_teacher_id_extended(
+            teacher_id=teacher_id,
+            week_parity=week_parity,
+        )

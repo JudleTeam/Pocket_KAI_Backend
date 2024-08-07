@@ -27,7 +27,7 @@ class LessonModel(BaseModel):
     parsed_dates: Mapped[list[date] | None] = mapped_column(
         MutableList.as_mutable(ARRAY(Date)),
     )
-    parsed_dates_status: Mapped[str | None] = mapped_column()
+    parsed_dates_status: Mapped[str] = mapped_column()
     audience_number: Mapped[str | None] = mapped_column()
     building_number: Mapped[str | None] = mapped_column()
     original_lesson_type: Mapped[str | None] = mapped_column()

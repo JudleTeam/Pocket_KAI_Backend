@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 
 from pocket_kai.controllers.schemas.department import DepartmentRead
 from pocket_kai.controllers.schemas.discipline import DisciplineRead
+from pocket_kai.controllers.schemas.group import ShortGroupRead
 from pocket_kai.controllers.schemas.teacher import TeacherRead
 from pocket_kai.domain.common import LessonType, ParsedDatesStatus, WeekParity
 
@@ -32,6 +33,17 @@ class LessonRead(LessonBase):
     group_id: UUID
 
     teacher: TeacherRead | None
+    department: DepartmentRead | None
+    discipline: DisciplineRead
+
+
+class TeacherLessonRead(LessonBase):
+    id: UUID
+    created_at: datetime
+    group_id: UUID
+
+    teacher_id: UUID
+    groups: list[ShortGroupRead]
     department: DepartmentRead | None
     discipline: DisciplineRead
 

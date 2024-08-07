@@ -2,7 +2,11 @@ from abc import abstractmethod
 
 from typing import Protocol
 
-from pocket_kai.application.dto.lesson import LessonExtendedDTO, LessonPatchDTO
+from pocket_kai.application.dto.lesson import (
+    LessonExtendedDTO,
+    LessonPatchDTO,
+    TeacherLessonExtendedDTO,
+)
 from pocket_kai.domain.common import WeekParity
 from pocket_kai.domain.entitites.lesson import LessonEntity
 
@@ -26,6 +30,14 @@ class LessonReader(Protocol):
         group_id: str,
         week_parity: WeekParity,
     ) -> list[LessonExtendedDTO]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_by_teacher_id_extended(
+        self,
+        teacher_id: str,
+        week_parity: WeekParity,
+    ) -> list[TeacherLessonExtendedDTO]:
         raise NotImplementedError
 
 

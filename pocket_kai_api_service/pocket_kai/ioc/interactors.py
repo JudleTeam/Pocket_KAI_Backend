@@ -30,6 +30,7 @@ from pocket_kai.application.interactors.lesson import (
     DeleteLessonInteractor,
     ExtendedLessonConverter,
     GetLessonsByGroupIdInteractor,
+    GetLessonsByTeacherIdInteractor,
     UpdateLessonInteractor,
 )
 from pocket_kai.application.interactors.refresh_token import RefreshTokenPairInteractor
@@ -100,5 +101,6 @@ class InteractorsProvider(Provider):
         GetGroupDisciplinesWithTeachersInteractor,
         GetGroupMembersByUserIdInteractor,
         SuggestTeachersByNameInteractor,
+        GetLessonsByTeacherIdInteractor,
         scope=Scope.REQUEST,
     )

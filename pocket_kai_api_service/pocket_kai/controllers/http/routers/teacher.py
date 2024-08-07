@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from typing import Annotated
 
 from dishka import FromDishka
@@ -5,6 +7,7 @@ from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from pocket_kai.application.dto.teacher import NewTeacherDTO
+from pocket_kai.application.interactors.lesson import GetLessonsByTeacherIdInteractor
 from pocket_kai.application.interactors.teacher import (
     CreateTeacherInteractor,
     GetTeacherByLoginInteractor,
@@ -12,7 +15,9 @@ from pocket_kai.application.interactors.teacher import (
 )
 from pocket_kai.controllers.http.dependencies import check_service_token
 from pocket_kai.controllers.schemas.common import ErrorMessage
+from pocket_kai.controllers.schemas.lesson import TeacherLessonRead
 from pocket_kai.controllers.schemas.teacher import TeacherCreate, TeacherRead
+from pocket_kai.domain.common import WeekParity
 from pocket_kai.domain.exceptions.teacher import (
     TeacherAlreadyExistsError,
     TeacherNotFoundError,
@@ -47,6 +52,35 @@ async def get_teacher_by_login(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f'Teacher with login "{login}" not found',
+        )
+
+
+@router.get(
+    '/by_id/{teacher_id}/schedule',
+    response_model=list[TeacherLessonRead],
+    responses={
+        404: {
+            'description': 'Преподаватель не найден',
+            'model': ErrorMessage,
+        },
+    },
+)
+async def get_teacher_schedule(
+    teacher_id: UUID,
+    week_parity: WeekParity = WeekParity.ANY,
+    *,
+    interactor: FromDishka[GetLessonsByTeacherIdInteractor],
+):
+    """
+    Возвращает расписание преподавателя по его ID.
+    Если занятия дублируются для нескольких групп, то
+    """
+    try:
+        return await interactor(teacher_id=str(teacher_id), week_parity=week_parity)
+    except TeacherNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'Teacher with id "{teacher_id}" not found',
         )
 
 
