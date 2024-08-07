@@ -97,7 +97,10 @@ class LessonGateway(LessonReader, LessonSaver, LessonUpdater, LessonDeleter):
                 lesson_record.number_of_day,
                 lesson_record.start_time,
                 lesson_record.parsed_lesson_type,
-                lesson_record.parsed_dates,
+                lesson_record.original_dates,
+                lesson_record.audience_number,
+                lesson_record.building_number,
+                lesson_record.discipline_id,
             )
 
             if lesson_key not in result_dict:
@@ -131,6 +134,9 @@ class LessonGateway(LessonReader, LessonSaver, LessonUpdater, LessonDeleter):
                 result_dict[lesson_key].groups.append(
                     GroupGateway._db_to_entity(lesson_record.group),
                 )
+
+        for lesson_key in result_dict:
+            result_dict[lesson_key].groups.sort(key=lambda x: x.group_name)
 
         return list(result_dict.values())
 
