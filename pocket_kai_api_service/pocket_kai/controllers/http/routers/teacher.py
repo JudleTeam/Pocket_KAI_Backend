@@ -73,7 +73,7 @@ async def get_teacher_schedule(
 ):
     """
     Возвращает расписание преподавателя по его ID.
-    Если занятия дублируются для нескольких групп, то
+    Если занятия дублируются для нескольких групп, то они объединяются в одно занятие. Все группы доступны в поле `groups`
     """
     try:
         return await interactor(teacher_id=str(teacher_id), week_parity=week_parity)
