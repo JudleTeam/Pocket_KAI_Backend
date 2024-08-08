@@ -2,10 +2,11 @@ from dishka import FromDishka
 from typing import Annotated
 
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, Cookie, Form, HTTPException, Response, status
+from fastapi import APIRouter, Form, HTTPException, status
 
 from pocket_kai.application.interactors.kai_login import KaiLoginInteractor
 from pocket_kai.application.interactors.refresh_token import RefreshTokenPairInteractor
+from pocket_kai.controllers.schemas.auth import TokenPairResponse
 from pocket_kai.controllers.schemas.common import ErrorMessage
 from pocket_kai.domain.exceptions.auth import InvalidTokenError
 from pocket_kai.domain.exceptions.kai_parser import (
@@ -21,6 +22,7 @@ router = APIRouter(route_class=DishkaRoute)
 
 @router.post(
     '/login',
+    response_model=TokenPairResponse,
     responses={
         401: {
             'description': 'Неверные логин или пароль',
@@ -37,12 +39,11 @@ async def login_with_kai_credentials(
     password: Annotated[str, Form()],
     *,
     interactor: FromDishka[KaiLoginInteractor],
-    response: Response,
 ):
     """
     Выполняет вход с помощью данных от личного кабинета на сайте КАИ.
 
-    В ответ возвращает Access-токен, живущий 15 минут. Также проставляет Refresh-токен в HttpOnly cookie, живущий 28 дней.
+    В ответ возвращает Access-токен, живущий 15 минут, и Refresh-токен в, живущий 28 дней.
 
     Может выполняться долго - от 5 до 20 секунд, зависит от скорости ответа сайта КАИ.
 
@@ -82,20 +83,15 @@ async def login_with_kai_credentials(
             detail='KAI parser service unavailable',
         )
 
-    response.set_cookie(
-        key='RefreshToken',
-        value=refresh_token,
-        httponly=True,
-        secure=True,
-        path='/auth/refresh_token',
-        samesite='none',  # TODO: check if it feets for production
+    return TokenPairResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
     )
-
-    return {'access_token': access_token, 'token_type': 'bearer'}
 
 
 @router.post(
     '/refresh_token',
+    response_model=TokenPairResponse,
     responses={
         400: {
             'description': 'Невалидный Refresh-токен',
@@ -104,27 +100,20 @@ async def login_with_kai_credentials(
     },
 )
 async def refresh_token_pair(
-    refresh_token: Annotated[str, Cookie(alias='RefreshToken')],
+    refresh_token: Annotated[str, Form()],
     *,
     interactor: FromDishka[RefreshTokenPairInteractor],
-    response: Response,
 ):
     """
-    Использует Refresh-токен из cookie для выпуска новой пары токенов Refresh + Access.
-    В ответ возвращает Access-токен, живущий 15 минут, и проставляет новый Refresh-токен в HttpOnly cookie, живущий 28 дней.
+    Использует Refresh-токен для выпуска новой пары токенов Refresh + Access.
+    В ответ возвращает Access-токен, живущий 15 минут, и Refresh-токен, живущий 28 дней.
     """
     try:
-        access_token, refresh_token = await interactor(refresh_token=refresh_token)
+        access_token, new_refresh_token = await interactor(refresh_token=refresh_token)
     except (RefreshTokenNotFoundError, InvalidTokenError):
         raise HTTPException(status_code=400, detail='Invalid refresh token')
 
-    response.set_cookie(
-        key='RefreshToken',
-        value=refresh_token,
-        httponly=True,
-        secure=True,
-        path='/auth/refresh_token',
-        samesite='none',  # TODO: check if it feets for production
+    return TokenPairResponse(
+        access_token=access_token,
+        refresh_token=new_refresh_token,
     )
-
-    return {'access_token': access_token, 'token_type': 'bearer'}
