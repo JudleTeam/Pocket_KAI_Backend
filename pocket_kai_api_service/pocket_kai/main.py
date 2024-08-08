@@ -3,6 +3,7 @@ from dishka.integrations import fastapi as dishka_fastapi
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from pocket_kai.config import Settings, get_settings
 from pocket_kai.controllers.http.routers.main import router
@@ -79,6 +80,8 @@ def get_fastapi_app(lifespan=None) -> FastAPI:
 
 def get_production_fastapi_app() -> FastAPI:
     fastapi_app = get_fastapi_app()
+
+    Instrumentator().instrument(fastapi_app).expose(fastapi_app)
 
     fastapi_app.add_middleware(
         CORSMiddleware,
